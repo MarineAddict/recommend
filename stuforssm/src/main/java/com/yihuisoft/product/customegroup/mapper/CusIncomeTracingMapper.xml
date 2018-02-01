@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.customegroup.mapper.CusIncomeTracingMapper">
+  <resultMap id="BaseResultMap" type="com.yihuisoft.product.customegroup.entity.CusIncomeTracing">
+    <result property="cusId" column="CUS_ID"/>
+	<result property="groupId" column="GROUP_ID"/>
+	<result property="planId" column="PLAN_ID"/>
+	<result property="custName" column="CUST_NAME"/>
+  </resultMap>  
+  	<select id="selectGroupIdByPlanAndCusId" resultMap="BaseResultMap">
+		SELECT * FROM CUS_INCOME_TRACING WHERE CUS_ID = #{cusId} AND PLAN_ID = #{planId}
+	</select>
+ </mapper>
+			

@@ -1,0 +1,81 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--设置SpringBoot的Parent-->
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>1.5.2.RELEASE</version>
+  </parent>
+
+  <!--Maven 项目的GPAV-->
+  <groupId>com.mcstu</groupId>
+  <artifactId>springboot</artifactId>
+  <packaging>war</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>springboot Maven Webapp</name>
+  <url>http://maven.apache.org</url>
+
+  <!--Maven 添加jar包的位置-->
+  <dependencies>
+      <!--spring boot的web支持-->
+      <!--Start pom 官方提供的技术支持，添加依赖，消除相应的配置-->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-web</artifactId>
+      </dependency>
+
+      <!-- swagger -->
+      <dependency>
+          <groupId>io.springfox</groupId>
+          <artifactId>springfox-swagger2</artifactId>
+          <version>2.6.1</version>
+      </dependency>
+      <dependency>
+          <groupId>io.springfox</groupId>
+          <artifactId>springfox-swagger-ui</artifactId>
+          <version>2.6.1</version>
+      </dependency>
+
+      <!-- oracle驱动 -->
+      <dependency>
+          <groupId>com.oracle</groupId>
+          <artifactId>ojdbc6</artifactId>
+          <version>12.1.0.1-atlassian-hosted</version>
+      </dependency>
+
+      <!-- mybatis -->
+      <dependency>
+          <groupId>org.mybatis.spring.boot</groupId>
+          <artifactId>mybatis-spring-boot-starter</artifactId>
+          <version>1.1.1</version>
+      </dependency>
+
+      <!-- 数据库连接池 -->
+      <dependency>
+          <groupId>com.alibaba</groupId>
+          <artifactId>druid</artifactId>
+          <version>1.0.5</version>
+      </dependency>
+
+      <!--Tomcat 打包时将其排除-->
+      <!--<dependency>-->
+          <!--<groupId>org.springframework.boot</groupId>-->
+          <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+          <!--<scope>provided</scope>-->
+      <!--</dependency>-->
+  </dependencies>
+
+  <!--Maven 添加插件的位置-->
+  <build>
+    <finalName>springboot</finalName>
+      <plugins>
+          <!--Spring boot的插件-->
+          <plugin>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-maven-plugin</artifactId>
+          </plugin>
+      </plugins>
+  </build>
+</project>

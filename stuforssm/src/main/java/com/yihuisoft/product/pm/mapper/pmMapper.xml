@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.pm.mapper.pmMapper">
+	<resultMap id="BaseResultMap" type="com.yihuisoft.product.pm.entity.pmProduct" >
+		<result column="ID" property="id" jdbcType="INTEGER" />
+		<result column="CODE" property="productCode" jdbcType="VARCHAR" />
+		<result column="YIELD_RATIO" property="yieldRatio" jdbcType="NUMERIC" />
+		<result column="RISK_RATIO" property="riskRatio" jdbcType="NUMERIC" />
+		<result column="NAV_DATE" property="navDate" jdbcType="VARCHAR" />
+		<result column="NAVDJ" property="navaDj" jdbcType="NUMERIC" />
+	</resultMap>
+	
+	<resultMap id="BasicResultMap" type="com.yihuisoft.product.pm.entity.PmBasic" >
+		<result column="ID" property="id" jdbcType="INTEGER" />
+		<result column="CODE" property="productCode" jdbcType="VARCHAR" />
+		<result column="CALCULATE_COVARIANCE" property="CALCULATE_COVARIANCE" jdbcType="VARCHAR" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="STATUS" property="status" jdbcType="VARCHAR" />
+		<result column="MATERIAL" property="material" jdbcType="VARCHAR" />
+		<result column="WEIGHT" property="weight" jdbcType="NUMERIC" />
+		<result column="RELEASE_DATE" property="releaseDate" jdbcType="VARCHAR" />
+		<result column="RISK_LEVEL" property="riskLevel" jdbcType="VARCHAR" />
+		<result column="UNIT" property="unit" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<select id="getYieldRatioLine" parameterType="map" resultMap="BaseResultMap">
+		SELECT * FROM 
+		<if test="'day' == cycle">PM_DATA_DAY</if>
+        <if test="'week' == cycle">PM_DATA_WEEK</if>
+        <if test="'month' == cycle">PM_DATA_MONTH</if>
+        <if test="'year' == cycle">PM_DATA_YEAR</if>
+		<where>
+			<if test="productCode != null and  productCode != '' ">
+			AND CODE=#{productCode}
+			</if>
+			<if test="startTime!=null and startTime!=''">
+			AND NAV_DATE &gt;= to_date(#{startTime},'yyyy-mm-dd')
+			</if>
+			<if test="endTime!=null and endTime!=''">
+			AND NAV_DATE &lt;= to_date(#{endTime},'yyyy-mm-dd')
+			</if>
+		</where>
+		ORDER BY NAV_DATE ASC
+	</select>
+	
+	<select id="getProductCodeList" resultType="String">
+		SELECT DISTINCT CODE FROM PM_NET_VALUE
+	</select>
+	
+	
+	<select id="getPmList" parameterType="map" resultMap="BasicResultMap">
+		SELECT * FROM PM_BASIC_DATA PM
+		<where>
+			<if test="productCode != null and  productCode != '' ">
+			AND PM.CODE LIKE '%' || #{productCode} || '%'
+			</if>
+			<if test="name!=null and name !=''">
+			AND PM.NAME LIKE '%' || #{name} || '%'
+			</if>
+			<if test="releaseDate!=null and releaseDate!=''">
+			AND PM.RELEASE_DATE &gt;= to_date(#{releaseDate},'yyyy-mm-dd')
+			</if>
+		</where>
+		ORDER BY RELEASE_DATE DESC
+	</select>
+	
+	
+</mapper>

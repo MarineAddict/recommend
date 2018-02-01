@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.group.mapper.ProductGroupMapper">
+    <resultMap id="ProupGroupBaseResultMap" type="com.yihuisoft.product.group.entity.ProductGroup" >
+        <result column="ID" property="id" jdbcType="INTEGER" />
+        <result column="PRODUCT_GROUP_ID" property="productCode" jdbcType="VARCHAR" />
+        <result column="YIELD_RATIO" property="yieldRatio" jdbcType="NUMERIC" />
+        <result column="RISK_RATIO" property="riskRatio" jdbcType="NUMERIC" />
+        <result column="NAV_DATE" property="navDate" jdbcType="VARCHAR" />
+        <result column="NAVDJ" property="navaDj" jdbcType="NUMERIC" />
+    </resultMap>
+    <select id="getProductGroupYieldRatioLine" parameterType="map" resultMap="ProupGroupBaseResultMap">
+        SELECT * FROM product_group_data_day
+        <where>
+            <if test="productGroupCode != null and  productGroupCode != '' ">
+                AND PRODUCT_GROUP_ID=#{productGroupCode}
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                AND NAV_DATE &gt;= to_date(#{startTime},'yyyy-mm-dd')
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                AND NAV_DATE &lt;= to_date(#{endTime},'yyyy-mm-dd')
+            </if>
+        </where>
+        ORDER BY NAV_DATE ASC
+    </select>
+    
+    <select id="getProductGroupDetailsBasic" resultType="com.yihuisoft.product.group.entity.ProductGroupBasic">
+    	select * from PRODUCT_GROUP_BASIC where ID = #{product_group_id}
+    </select>
+    
+    <select id="getProductGroupDetailsInfo" resultType="com.yihuisoft.product.group.entity.ProductGroupDetails">
+    	select * from PRODUCT_GROUP_DETAILS where PRODUCT_GROUP_ID = #{product_group_id}
+    </select>
+    
+    <insert id="insertProductGroup">
+        <selectKey resultType="int" order="BEFORE" keyProperty="id">
+            SELECT SEQ_PRODUCT_GROUP.Nextval as ID from DUAL
+        </selectKey>
+        insert into PRODUCT_GROUP_BASIC(id,product_group_name,CREATE_SOURCE,START_TIME,create_time) values
+        (SEQ_PRODUCT_GROUP.NEXTVAL,#{product_group_name},#{CREATE_SOURCE},
+        to_date (#{start_time},'YYYY-MM-DD hh:mi:ss' ),to_date (#{create_time},'YYYY-MM-DD hh:mi:ss' ))
+    </insert>
+    <update id="updateProductGroupSharpRatio">
+    	update PRODUCT_GROUP_BASIC set SHARPE_RATIO = #{sharpRatio} where id = #{product_group_id}
+    </update>
+    <insert id="insertProductGroupDetails">
+    	BEGIN
+        <foreach collection="templist" item="pgd" index="index" separator=";">
+        	insert into product_group_details values
+            (SEQ_PRODUCT_GROUP_DETAILS.NEXTVAL,#{product_group_id},#{pgd.product_code},#{pgd.proportion},
+            to_date(#{pgd.last_mod_time},'YYYY-MM-DD hh:mi:ss'),#{pgd.product_type})
+        </foreach>
+        ;END;
+    </insert>
+    
+    <update id="deleteProductGroup">
+    	update product_group_basic set status = 0,STOP_TIME =to_date(#{time},'YYYY-MM-DD hh:mi:ss')  where id = #{product_group_id}
+    </update>
+    
+    <select id="getProductGroup" resultType="String">
+        SELECT id FROM product_group_basic
+        <where>
+            <if test="productGroupCode != null and  productGroupCode != '' ">
+                ID=#{productGroupCode}
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                AND CREATE_TIME &gt;= to_date(#{startTime},'YYYY-MM-DD hh24:mi:ss')
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                AND CREATE_TIME &lt;= to_date(#{endTime},'YYYY-MM-DD hh24:mi:ss')
+            </if>
+            <if test="type == null or type == ''">
+            	and status = 1
+            </if>
+        </where>
+        ORDER BY CREATE_TIME ASC
+    </select>
+    
+    <select id="getNavadjStartTime" resultType="java.lang.String">
+    	select * from (select to_char(navlatestdate,'yyyy-MM-dd') navlatestdate from product_group_net_value 
+    	where product_group_id = #{product_group_id} order by navlatestdate desc ) where rownum=1
+    </select>
+    
+    <select id="getGroupStartTime">
+    	select to_char(CREATE_TIME,'yyyy-MM-dd') CREATE_TIME from product_group_basic where id = #{product_group_id}
+    </select>
+    
+    <select id="getProductNavadj" resultType="com.yihuisoft.product.group.entity.dao.ProductNavadjDAO">
+    	select sum(b.proportion*c.navadj) navadj,to_char(c.NAVLATESTDATE,'YYYY-MM-DD hh24:mi:ss') NAVLATESTDATE 
+    	from product_group_basic a,product_group_details b,
+    	<if test="type == 'fund'">
+    		fund_net_value c
+    	</if>
+    	<if test="type == 'finance'">
+    		finance_net_value c
+    	</if>
+    	<if test="type == 'pm'">
+    		pm_net_value c
+    	</if>
+    	<if test="type == 'deposit'">
+    		deposit_net_value c
+    	</if>
+        where a.id=b.product_group_id and b.PRODUCT_CODE=c.code and to_char(c.NAVLATESTDATE,'YYYY-MM-DD') >= #{startTime} 
+        and b.PRODUCT_GROUP_ID=#{product_group_id} group by c.NAVLATESTDATE order by c.NAVLATESTDATE asc
+    </select>
+    
+    <insert id="insertProductGroupNavadj">
+    	BEGIN
+        <foreach collection="templist" item="pgd" index="index" separator=";">
+        	insert into product_group_net_value values
+            (#{pgd.code},#{pgd.navadj},to_date(#{pgd.navlatestdate},'YYYY-MM-DD hh24:mi:ss'))
+        </foreach>
+        ;END;
+    </insert>
+</mapper>

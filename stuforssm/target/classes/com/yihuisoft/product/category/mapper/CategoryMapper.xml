@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.category.mapper.CategoryMapper">
+    <resultMap id="categoryBig" type="com.yihuisoft.product.category.entity.CategoryBig">
+        <result column="ID" property="id" jdbcType="NUMERIC"/>
+        <result column="CODE" property="code" jdbcType="NUMERIC"/>
+        <result column="NAME" property="name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="categorySmall" type="com.yihuisoft.product.category.entity.CategorySmall">
+        <result column="ID" property="id" jdbcType="NUMERIC"/>
+        <result column="CODE" property="code" jdbcType="NUMERIC"/>
+        <result column="NAME" property="name" jdbcType="VARCHAR"/>
+        <result column="FNAME" property="fcode" jdbcType="NUMERIC"/>
+    </resultMap>
+
+    <insert id="createNewCategoryBig" parameterType="map" >
+        insert into category_big values(seq_category_big.nextval, seq_category_big.currval,#{map.bigCategory})
+    </insert>
+
+    <insert id="createNewCategorySmall" parameterType="map">
+        insert into category_small values(seq_category_small.nextval,#{map.smallcode},#{map.smallCategory},#{map.bigcode})
+    </insert>
+
+    <update id="changeCategoryBig" parameterType="map">
+        update category_big set name = #{map.bigCategory} where id = #{map.bigid}
+    </update>
+
+    <update id="changeCategorySmall" parameterType="map">
+        update category_small set name = #{map.smallCategory} where id = #{map.smallid}
+    </update>
+
+    <delete id="delteCategoryBig" parameterType="map">
+        delete category_big where id = #{map.id}
+    </delete>
+
+    <delete id="delteCategorySmall" parameterType="map">
+        delete category_small where id = #{map.id}
+    </delete>
+
+    <select id="selectAllCategoryBig" parameterType="map" resultMap="categoryBig">
+        select * from category_big
+    </select>
+
+    <select id="selectAllCategorySmall" parameterType="map" resultMap="categorySmall">
+        select * from category_small where fcode = #{map.id}
+    </select>
+</mapper>

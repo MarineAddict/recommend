@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.finance.mapper.FinanceBasicDataMapper">
+	<resultMap id="BaseResultMap"
+		type="com.yihuisoft.product.finance.entity.FinanceBasicData">
+		<result property="id" column="ID" />
+		<result property="financeCode" column="FINANCE_CODE" />
+		<result property="expYieldMax" column="EXP_YIELD_MAX" />
+		<result property="realYield" column="REAL_YIELD" />
+		<result property="valueDate" column="VALUE_DATE" />
+		<result property="expiryDate" column="EXPIRY_DATE" />
+		<result property="expYieldMin" column="EXP_YIELD_MIN" />
+		<result property="risklevel" column="RISK_LEVEL" />
+		<result property="financeName" column="FINANCE_NAME" />
+		<result property="financeStatus" column="FINANCE_STATUS" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		ID, FINANCE_CODE, EXP_YIELD_MAX, REAL_YIELD, VALUE_DATE, EXPIRY_DATE,
+		EXP_YIELD_MIN, RISK_LEVEL,FINANCE_NAME,FINANCE_STATUS
+	</sql>
+	
+	<select id="selectFinanceList" resultMap="BaseResultMap">
+		SELECT FINANCE_CODE,FINANCE_NAME, EXP_YIELD_MAX, REAL_YIELD, VALUE_DATE,
+		EXPIRY_DATE, EXP_YIELD_MIN, RISK_LEVEL,FINANCE_STATUS FROM FINANCE_BASIC_DATA FBD
+		<where>
+			<if test="code != null and  code != '' ">
+			AND FBD.FINANCE_CODE LIKE '%' || #{code} || '%'
+			</if>
+			<if test="financeName!=null and financeName!=''">
+			AND FBD.FINANCE_NAME LIKE '%' || #{financeName}|| '%'
+			</if>
+			<if test="status!=null and status!=''">
+			AND FBD.FINANCE_STATUS = #{status}
+			</if>
+		</where>
+	</select>
+</mapper>

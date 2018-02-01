@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.grand.fund.mapper.FundMapper">
+    <update id="update" parameterType="Map">
+        update TEST_TABLE set TITLE_NAME = #{map.name} WHERE LOCATION = #{map.name}
+    </update>
+
+    <select id="update1" parameterType="Map" resultType="int">
+        select LOCATION from TEST_TABLE WHERE LOCATION = #{map.name}
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+
+

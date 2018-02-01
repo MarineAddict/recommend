@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    username: uwp_recommend
+    password: 123456
+    url: jdbc:oracle:thin:@192.168.1.123:1521/ORCL
+server:
+  port: 8088
+mybatis:
+    config-locations: classpath:mybatis/mybatis-config.xml
+    mapper-locations: classpath:mybatis/mapper/*.xml

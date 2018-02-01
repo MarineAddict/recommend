@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.fund.mapper.FundMapper">
+    <resultMap id="FundBaseResultMap" type="com.yihuisoft.product.fund.entity.dao.FundProductDAO" >
+        <result column="ID" property="id" jdbcType="INTEGER" />
+        <result column="CODE" property="productCode" jdbcType="VARCHAR" />
+        <result column="YIELD_RATIO" property="yieldRatio" jdbcType="NUMERIC" />
+        <result column="RISK_RATIO" property="riskRatio" jdbcType="NUMERIC" />
+        <result column="NAV_DATE" property="navDate" jdbcType="VARCHAR" />
+        <result column="NAVDJ" property="navaDj" jdbcType="NUMERIC" />
+    </resultMap>
+    <select id="getFundYieldRisk" parameterType="map" resultMap="FundBaseResultMap">
+        SELECT * FROM 
+        <if test="'day' == cycle">fund_data_day</if>
+        <if test="'week' == cycle">fund_data_week</if>
+        <if test="'month' == cycle">fund_data_month</if>
+        <if test="'year' == cycle">fund_data_year</if>
+        <where>
+            <if test="productCode != null and  productCode != '' ">
+                AND CODE=#{productCode}
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                AND NAV_DATE &gt;= to_date(#{startTime},'yyyy-mm-dd')
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                AND NAV_DATE &lt;= to_date(#{endTime},'yyyy-mm-dd')
+            </if>
+        </where>
+        ORDER BY NAV_DATE ASC
+    </select>
+    
+    <select id="getFundBasicInfo" resultType="com.yihuisoft.product.fund.entity.dao.FundBasicDAO">
+    	select * from fund_basic_data
+    	<where>
+            <if test="code != null and  code != '' ">
+                CODE=#{code}
+            </if>
+    	</where>
+    </select>
+
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yihuisoft.product.customegroup.mapper.ProductGroupDetailsMapper">
+	<resultMap id="BaseResultMap"
+		type="com.yihuisoft.product.customegroup.entity.ProductGroupDetails">
+		<result property="yieldRadio" column="YIELD_RATIO" />
+		<result property="riskRadio" column="RISK_RATIO" />
+		<result property="productGroupId" column="ID" />
+		<result property="productCode" column="PRODUCT_CODE" />
+		<result property="productGroupName" column="PRODUCT_GROUP_NAME" />
+		<result property="proportion" column="PROPORTION" />
+		<result property="navDate" column="NAV_DATE" />
+		<result property="navaDj" column="NAVADJ" />
+	</resultMap>
+
+	<resultMap id="GroupBase"
+		type="com.yihuisoft.product.customegroup.entity.ProductGroupDetails">
+		<result property="productCode" column="PRODUCT_CODE" />
+		<result property="productGroupName" column="PRODUCT_GROUP_NAME" />
+		<result property="proportion" column="PROPORTION" />
+	</resultMap>
+
+	<resultMap id="CustBase"
+		type="com.yihuisoft.product.customegroup.entity.ProductGroupDetails">
+		<result property="yieldRadio" column="YIELD_RATIO" />
+		<result property="navDate" column="NAV_DATE" />
+		<result property="navaDj" column="NAVADJ" />
+	</resultMap>
+
+	<select id="selectProductGroupByGroupId" resultMap="GroupBase">
+		select PRODUCT_CODE,PROPORTION,product_group_id, (select PRODUCT_GROUP_NAME
+		from PRODUCT_GROUP_BASIC where id = #{groupId}) as PRODUCT_GROUP_NAME, (select status
+		from PRODUCT_GROUP_BASIC where id = #{groupId}) as status from PRODUCT_GROUP_DETAILS
+		where PRODUCT_GROUP_ID = #{groupId}
+	</select>
+
+	<select id="selectGroupById" parameterType="map" resultMap="CustBase">
+		SELECT NAVADJ,NAV_DATE,YIELD_RATIO FROM PRODUCT_GROUP_DATA_DAY FDD
+		<where>
+			<if test="groupId!=null and groupId!=''">
+				AND FDD.PRODUCT_GROUP_ID = #{groupId}
+			</if>
+			<if test="startTime!=null and startTime!=''">
+				AND FDD.NAV_DATE &gt;= to_date(#{startTime},'yyyy-mm-dd')
+			</if>
+			<if test="endTime!=null and endTime!=''">
+				AND FDD.NAV_DATE &lt;= to_date(#{endTime},'yyyy-mm-dd')
+			</if>
+		</where>
+
+	</select>
+
+	<select id="selectCusProGroupByGroupId" resultMap="BaseResultMap">
+		SELECT
+		C.NAV_DATE,B.PRODUCT_GROUP_NAME,A.PRODUCT_CODE,A.PROPORTION ,
+		C.RISK_RATIO,C.YIELD_RATIO FROM (PRODUCT_GROUP_DETAILS A LEFT JOIN
+		PRODUCT_GROUP_BASIC B ON A.PRODUCT_GROUP_ID =#{groupId} AND B.ID =
+		A.PRODUCT_GROUP_ID) LEFT JOIN PRODUCT_GROUP_DATA_DAY C ON
+		C.PRODUCT_GROUP_ID = A.PRODUCT_GROUP_ID
+	</select>
+</mapper>

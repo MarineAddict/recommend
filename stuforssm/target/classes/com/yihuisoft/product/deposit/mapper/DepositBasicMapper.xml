@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.deposit.mapper.DepositBasicMapper">
+    <resultMap id="DepositBaseResultMap" type="com.yihuisoft.product.deposit.entity.DepositBasic">
+        <result column="ID" property="id" jdbcType="NUMERIC" />
+        <result column="CODE" property="code" jdbcType="VARCHAR" />
+        <result column="NAME" property="name" jdbcType="VARCHAR" />
+        <result column="SUBSTARTDAY" property="substartday" jdbcType="DATE" />
+        <result column="SUBENDDAY" property="subendday" jdbcType="DATE" />
+        <result column="INTSTARTDAY" property="intestartday" jdbcType="DATE" />
+        <result column="INTENDDAY" property="intendday" jdbcType="DATE" />
+        <result column="INTEREST" property="interest" jdbcType="NUMERIC" />
+        <result column="THETERM" property="theterm" jdbcType="NUMERIC" />
+        <result column="CALCULATE_COVARIANCE" property="calculate_covariance" jdbcType="NUMERIC" />
+    </resultMap>
+
+    <resultMap id="DepositResultMap" type="com.yihuisoft.product.deposit.entity.Deposit" >
+        <result column="ID" property="id" jdbcType="INTEGER" />
+        <result column="CODE" property="productCode" jdbcType="VARCHAR" />
+        <result column="YIELD_RATIO" property="yieldRatio" jdbcType="NUMERIC" />
+        <result column="RISK_RATIO" property="riskRatio" jdbcType="NUMERIC" />
+        <result column="NAV_DATE" property="navDate" jdbcType="VARCHAR" />
+        <result column="NAVDJ" property="navaDj" jdbcType="NUMERIC" />
+    </resultMap>
+
+    <select id="getDepositBasicList" parameterType="map" resultMap="DepositBaseResultMap">
+        SELECT * FROM DEPOSIT_BASIC_DATA
+        <where>
+            <if test="map.depositcode != null and map.depositcode != '' ">
+                AND CODE = #{map.depositcode}
+            </if>
+            <if test="map.depositname != null and map.depositname != '' ">
+                AND NAME = #{map.depositname}
+            </if>
+        </where>
+        ORDER BY CODE ASC
+    </select>
+
+    <select id="getYieldRatioLine" parameterType="map" resultMap="DepositResultMap">
+        SELECT * FROM DEPOSIT_DATA_DAY DEPOSIT
+        <where>
+            <if test="map.productCode != null and  map.productCode != '' ">
+                AND DEPOSIT.CODE=#{map.productCode}
+            </if>
+            <if test="map.startTime!=null and map.startTime!=''">
+                AND DEPOSIT.NAV_DATE &gt;= to_date(#{map.startTime},'yyyy-mm-dd')
+            </if>
+            <if test="map.endTime!=null and map.endTime!=''">
+                AND DEPOSIT.NAV_DATE &lt;= to_date(#{map.endTime},'yyyy-mm-dd')
+            </if>
+        </where>
+        ORDER BY NAV_DATE ASC
+    </select>
+
+    <!--<select id="getIncome" parameterType="map" resultType="float">-->
+        <!--SELECT INTEREST FROM DEPOSIT_BASIC_DATA WHERE CODE = #{map.productCode}-->
+    <!--</select>-->
+</mapper>

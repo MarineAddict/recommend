@@ -1,0 +1,46 @@
+
+httpUrl: 
+  test: http://localhost:8088/stuforssm
+  
+
+urlMap: 
+   finance:
+      type: 1
+      base_url: finance
+      netValue_url: getNetValue
+      yieldRate_url: getFinanceHistoryIncomeLine
+      expYieldRate_url: getFinanceExpIncome
+      expRiskRate_url: getFinanceExpRisk
+   fund:
+      type: 2
+      base_url: fund
+      netValue_url: getNetValue
+      yieldRate_url: yieldRate
+      expYieldRate_url: expYieldRate
+      expRiskRate_url: expRiskRate
+   deposit:
+      type: 3
+      base_url: deposit
+      yieldRatioLine_url: yieldRatioLine
+
+excelMap: 
+   产品类型: prodType
+   产品代码: prodCode
+   收益率: yieldRate
+   净值: netValue
+   单位净值: netValue
+   净值日期: navDate
+   起始日期: startDate
+   起始时间: startDate
+   结束日期: endDate
+   开始时间: startDate
+   结束时间: endDate
+   风险率: riskRate
+   预期收益率: expYieldRate
+   预期风险率: expRiskRate
+excelTitle: 
+   calculatedYieldRate: 计算收益率
+   calculatedNetValue: 计算净值
+   calculatedExpYieldRate: 计算预期收益率
+   calculatedExpRiskRate: 计算预期风险率
+   

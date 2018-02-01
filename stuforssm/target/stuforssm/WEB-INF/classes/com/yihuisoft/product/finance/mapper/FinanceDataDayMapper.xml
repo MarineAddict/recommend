@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.finance.mapper.FinanceDataDayMapper">
+  <resultMap id="BaseResultMap" type="com.yihuisoft.product.finance.entity.FinanceDataDay">
+    <result property="id" column="ID"/>
+	<result property="financeCode" column="FINANCE_CODE"/>
+	<result property="yieldRatio" column="YIELD_RATIO"/>
+	<result property="riskRatio" column="RISK_RATIO"/>
+	<result property="navDate" column="NAV_DATE"/>
+	<result property="navaDj" column="NAVADJ"/>
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    FINANCE_CODE, YIELD_RATIO, RISK_RATIO, NAV_DATE, NAVADJ
+  </sql>
+  	<select id="getFinanceYieldRatioLine" parameterType="map" resultMap="BaseResultMap">
+		SELECT * FROM FINANCE_DATA_DAY FDD
+		<where>
+			<if test="productCode != null and  productCode != '' ">
+			AND FDD.FINANCE_CODE = #{productCode}
+			</if>
+			<if test="startTime!=null and startTime!=''">
+			AND FDD.NAV_DATE &gt;= to_date(#{startTime},'yyyy-mm-dd')
+			</if>
+			<if test="endTime!=null and endTime!=''">
+			AND FDD.NAV_DATE &lt;= to_date(#{endTime},'yyyy-mm-dd')
+			</if>
+		</where>
+		ORDER BY NAV_DATE ASC
+	</select>
+	
+	<select id="getDataDay" parameterType="map" resultMap="BaseResultMap">
+		SELECT * FROM FINANCE_DATA_DAY 
+	  <where>
+            <if test="productCode != null and  productCode != '' ">
+                AND FINANCE_CODE=#{productCode}
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                AND NAV_DATE &gt;= to_date(#{startTime},'yyyy-mm-dd')
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                AND NAV_DATE &lt;= to_date(#{endTime},'yyyy-mm-dd')
+            </if>
+        </where>
+		ORDER BY NAV_DATE ASC
+	</select>
+	
+	<select id="getDataWeek" parameterType="map" resultMap="BaseResultMap">
+		SELECT * FROM FINANCE_DATA_WEEK FDW
+		<where>
+			<if test="financeCode != null and  financeCode != '' ">
+			AND FDW.FINANCE_CODE=#{financeCode}
+			</if>
+			<if test="startTime!=null and startTime!=''">
+			AND FDW.NAV_DATE &gt;= to_date(#{startTime},'yyyy-mm-dd')
+			</if>
+			<if test="endTime!=null and endTime!=''">
+			AND FDW.NAV_DATE &lt;= to_date(#{endTime},'yyyy-mm-dd')
+			</if>
+		</where>
+		ORDER BY NAV_DATE ASC
+	</select>
+	
+	<select id="getDataMonth" parameterType="map" resultMap="BaseResultMap">
+		SELECT * FROM FINANCE_DATA_MONTH FDM
+		<where>
+			<if test="financeCode != null and  financeCode != '' ">
+			AND FDM.FINANCE_CODE=#{financeCode}
+			</if>
+			<if test="startTime!=null and startTime!=''">
+			AND FDM.NAV_DATE &gt;= to_date(#{startTime},'yyyy-mm-dd')
+			</if>
+			<if test="endTime!=null and endTime!=''">
+			AND FDM.NAV_DATE &lt;= to_date(#{endTime},'yyyy-mm-dd')
+			</if>
+		</where>
+		ORDER BY NAV_DATE ASC
+	</select>
+	
+	<select id="getDataYear" parameterType="map" resultMap="BaseResultMap">
+		SELECT * FROM FINANCE_DATA_YEAR FDY
+		<where>
+			<if test="financeCode != null and  financeCode != '' ">
+			AND FDY.FINANCE_CODE=#{financeCode}
+			</if>
+			<if test="startTime!=null and startTime!=''">
+			AND FDY.NAV_DATE &gt;= to_date(#{startTime},'yyyy-mm-dd')
+			</if>
+			<if test="endTime!=null and endTime!=''">
+			AND FDY.NAV_DATE &lt;= to_date(#{endTime},'yyyy-mm-dd')
+			</if>
+		</where>
+		ORDER BY NAV_DATE ASC
+	</select>
+	
+	<select id="getGrowth" parameterType="map" resultMap="BaseResultMap">
+		SELECT * FROM FINANCE_DATA_DAY 
+		  <where>
+            <if test="productCode != null and  productCode != '' ">
+                AND FINANCE_CODE=#{productCode}
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                AND NAV_DATE &gt;= to_date(#{startTime},'yyyy-mm-dd')
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                AND NAV_DATE &lt;= to_date(#{endTime},'yyyy-mm-dd')
+            </if>
+        </where>
+        ORDER BY NAV_DATE ASC
+	</select>
+ </mapper>
