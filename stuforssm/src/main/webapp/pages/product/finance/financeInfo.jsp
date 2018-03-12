@@ -14,7 +14,7 @@ width:1000px;
 <body>
 	<div data-options="region:'north',title:'查询'"
 		style="height: 40px; background: #F4F4F4;">
-		<form id="searchForm">
+		<form id="fin_searchForm">
 			<table>
 				<tr>
 					<th>产品名称：</th>
@@ -22,9 +22,10 @@ width:1000px;
 					<th>产品代码：</th>
 					<td><input name="code" /></td>
 					<th>状态</th>
-					<td><select class="easyui-combobox" name="status" style="width:200px;">
-						    <option value="1">可售</option>
-						    <option value="0">不可售</option>
+					<td><select class="easyui-combobox" name="status" style="width:200px;" id="finStatus">
+						    <option value="" selected>请选择</option>
+						    <option value="0">可售</option>
+						    <option value="1">不可售</option>
 						</select>
 					</td>
 					<!--由于datebox框架上面的数据必须是时间格式的，所以我们用editable="false"来禁止用户手动输入，以免报错-->
@@ -37,7 +38,6 @@ width:1000px;
 		</form>
 	</div>
 	<table id="financeList"></table>
-
 <script type="text/javascript">
 
 var sy = $.extend({}, sy);/*定义一个全局变量*/
@@ -56,13 +56,14 @@ sy.serializeObject = function (form) { /*将form表单内的元素序列化为�
 
 //点击查找按钮出发事件
 function searchFunc() {
-    $("#financeList").datagrid("load", sy.serializeObject($("#searchForm").form()));//将searchForm表单内的元素序列为对象传递到后台
+    $("#financeList").datagrid("load", sy.serializeObject($("#fin_searchForm").form()));//将fin_searchForm表单内的元素序列为对象传递到后台
 }
 
 //点击清空按钮出发事件
 function clearSearch() {
     $("#financeList").datagrid("load", {});//重新加载数据，无填写数据，向后台传递值则为空
-    $("#searchForm").find("input").val("");//找到form表单下的所有input标签并清空
+    $("#fin_searchForm").find("input").val("");//找到form表单下的所有input标签并清空
+    $('#finStatus').combobox('setValue', "");
 }
 	$('#financeList').datagrid({
 		width : '100%',
@@ -73,22 +74,59 @@ function clearSearch() {
 		rownumbers : true,
 		nowrap : true,
 		height : 'auto',
-		fit : true,
+		/* fit : true, */
 		fitColumns : true,
 		striped : true,
 		idField : 'bondId',
 		pageSize : 10,
+		pageNumber:1,
 		pageList : [ 10, 30, 50 ],
 		columns : [ [ {
 			field : 'financeName',
 			title : '产品名称',
-			width : 200,
+			width : 250,
 			align : 'center'
 		}, {
 			field : 'financeCode',
 			title : '产品代码',
 			width : 200,
 			align : 'center'
+		}, {
+			field : 'prdType',
+			title : '产品类型',
+			width : 200,
+			align : 'center'
+		}, {
+			field : 'scode',
+			title : '资产类别',
+			width : 200,
+			align : 'center',
+			formatter : function(value, row, index) {
+				if (value =='1') {
+					return '国内小盘股';
+				}
+				if (value =='2') {
+					return '国内大盘股';
+				}
+				if (value =='3') {
+					return '港股';
+				}
+				if (value =='4') {
+					return '美股';
+				}
+				if (value =='5') {
+					return '货币';
+				}
+				if (value =='6') {
+					return '普通债';
+				}
+				if (value =='7') {
+					return '纯债';
+				}
+				if (value =='8') {
+					return '黄金';
+				}
+			}
 		}, {
 			field : 'valueDate',
 			title : '起息日',
@@ -109,19 +147,29 @@ function clearSearch() {
 					return value.substring(0,10);
 				}
 			}
-		}, {
+		/* }, {
 			field : 'expYieldMin',
 			title : '预期最小收益率',
+			width : 200,
+			align : 'center' */
+		}, {
+			field : 'startMoney',
+			title : '起购金额(元)',
 			width : 200,
 			align : 'center'
 		}, {
 			field : 'expYieldMax',
-			title : '预期最大收益率',
+			title : '预期最大收益率(%)',
 			width : 200,
 			align : 'center'
-		}, {
+		/* }, {
 			field : 'realYield',
 			title : '实际收益率',
+			width : 200,
+			align : 'center' */
+		}, {
+			field : 'period',
+			title : '周期(天)',
 			width : 200,
 			align : 'center'
 		},{
@@ -142,8 +190,30 @@ function clearSearch() {
 			title : '风险等级',
 			width : 200,
 			align : 'center'
+		}, {
+			field : '详情',
+			title : '理财详情',
+			width : 200,
+			align : 'center',
+			formatter : function(value, row, index) {
+				return "<a onclick='financeDetail("+index+");' iframe='0'>详情</a>";
+			}
 		} ] ]
 	});
+	
+	
+	
+	function  financeDetail(index){
+		var financeCode = $('#financeList').datagrid('getData').rows[index].financeCode;
+		//var bidCode = $('#financeList').datagrid('getData').rows[index].bidcode;
+		//alert(financeCode);
+		//console.log(fundCode,bidCode);
+		addTab("理财信息", "${pageContext.request.contextPath}/finance/toFinanceDetail?code="+financeCode, "icon-chart-organisation", false);
+	}
+	
+	
+	
+	
 </script>
 </body>
 </html>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.macrofactor.mapper.MacroFactorMapper">
+    <resultMap id="MARCO_CPI_Map" type="com.yihuisoft.product.macrofactor.entity.MARCO_CPI" >
+        <result column="ID" property="id" jdbcType="INTEGER" />
+        <result column="CPI_DATE" property="cpi_date" jdbcType="VARCHAR" />
+        <result column="CPI_COUNTRY_MONTH" property="cpi_country_month" jdbcType="NUMERIC" />
+        <result column="CPI_COUNTRY_TOTAL" property="cpi_country_total" jdbcType="NUMERIC" />
+        <result column="CPI_CITY_MONTH" property="cpi_city_month" jdbcType="NUMERIC" />
+        <result column="CPI_CITY_TOTAL" property="cpi_city_total" jdbcType="NUMERIC" />
+        <result column="CPI_RURAL_MONTH" property="cpi_pural_month" jdbcType="NUMERIC" />
+        <result column="CPI_RURAL_TOTAL" property="cpi_pural_total" jdbcType="NUMERIC" />
+    </resultMap>
+    <resultMap id="MARCO_GDP_Map" type="com.yihuisoft.product.macrofactor.entity.MARCO_GDP" >
+        <result column="ID" property="id" jdbcType="INTEGER" />
+        <result column="GDP_DATE" property="gdp_date" jdbcType="VARCHAR" />
+        <result column="GDP_TOTAL" property="gdp_total" jdbcType="NUMERIC" />
+        <result column="GDP_FIRST" property="gdp_first" jdbcType="NUMERIC" />
+        <result column="GDP_SECOND" property="gdp_second" jdbcType="NUMERIC" />
+        <result column="GDP_THIRD" property="gdp_third" jdbcType="NUMERIC" />
+        <result column="GDP_TOTAL_YOY" property="gdp_total_yoy" jdbcType="NUMERIC" />
+        <result column="GDP_FIRST_YOY" property="gdp_first_yoy" jdbcType="NUMERIC" />
+        <result column="GDP_SECOND_YOY" property="gdp_second_yoy" jdbcType="NUMERIC" />
+        <result column="GDP_THIRD_YOY" property="gdp_third_yoy" jdbcType="NUMERIC" />
+    </resultMap>
+    <resultMap id="MARCO_MONEY_SUPPLY_Map" type="com.yihuisoft.product.macrofactor.entity.MARCO_MONEY_SUPPLY" >
+        <result column="ID" property="id" jdbcType="INTEGER" />
+        <result column="MS_DATE" property="ms_date" jdbcType="VARCHAR" />
+        <result column="M2" property="m2" jdbcType="NUMERIC" />
+        <result column="M2_YOY" property="m2_yoy" jdbcType="NUMERIC" />
+        <result column="M2_MOM" property="m2_mom" jdbcType="NUMERIC" />
+        <result column="M1" property="m1" jdbcType="NUMERIC" />
+        <result column="M1_YOY" property="m1_yoy" jdbcType="NUMERIC" />
+        <result column="M1_MOM" property="m1_mom" jdbcType="NUMERIC" />
+        <result column="M0" property="m0" jdbcType="NUMERIC" />
+        <result column="M0_YOY" property="m0_yoy" jdbcType="NUMERIC" />
+        <result column="M0_MOM" property="m0_mom" jdbcType="NUMERIC" />
+    </resultMap>
+    <resultMap id="MARCO_PMI_Map" type="com.yihuisoft.product.macrofactor.entity.MARCO_PMI" >
+        <result column="ID" property="id" jdbcType="INTEGER" />
+        <result column="PMI_DATE" property="pmi_date" jdbcType="VARCHAR" />
+        <result column="PMI_MANU" property="pmi_manu" jdbcType="NUMERIC" />
+        <result column="PMI_NON_MANU" property="pmi_non_manu" jdbcType="NUMERIC" />
+    </resultMap>
+    <resultMap id="MARCO_PPI_Map" type="com.yihuisoft.product.macrofactor.entity.MARCO_PPI" >
+        <result column="ID" property="id" jdbcType="INTEGER" />
+        <result column="PPI_DATE" property="ppi_date" jdbcType="VARCHAR" />
+        <result column="PPI_MONTH" property="ppi_month" jdbcType="NUMERIC" />
+        <result column="PPI_TOTAL" property="ppi_total" jdbcType="NUMERIC" />
+    </resultMap>
+
+    <select id="getAll_MARCO_CPI" resultMap="MARCO_CPI_Map">
+        SELECT * FROM MACRO_CPI
+        <where>
+            <if test="startTime!=null and startTime!='' ">
+               AND CPI_DATE <![CDATA[ >= ]]> to_date(#{startTime},'yyyy-mm-dd')
+            </if>
+            <if test="endTime!=null and endTime!='' ">
+                AND CPI_DATE <![CDATA[ <= ]]> to_date(#{endTime},'yyyy-mm-dd')
+            </if>
+        </where>
+        ORDER BY CPI_DATE
+    </select>
+    <select id="getAll_MARCO_GDP" resultMap="MARCO_GDP_Map">
+        SELECT * FROM MACRO_GDP
+        <where>
+            <if test="startTime!=null and startTime!='' ">
+                AND  GDP_DATE <![CDATA[ >= ]]> to_date(#{startTime},'yyyy-mm-dd')
+            </if>
+            <if test="endTime!=null and endTime!='' ">
+                AND  GDP_DATE <![CDATA[ <= ]]> to_date(#{endTime},'yyyy-mm-dd')
+            </if>
+        </where>
+        ORDER BY GDP_DATE
+    </select>
+    <select id="getAll_MARCO_MONEY_SUPPLY" resultMap="MARCO_MONEY_SUPPLY_Map">
+        SELECT * FROM MACRO_MONEY_SUPPLY
+        <where>
+            <if test="startTime!=null and startTime!='' ">
+                AND MS_DATE <![CDATA[ >= ]]> to_date(#{startTime},'yyyy-mm-dd')
+            </if>
+            <if test="endTime!=null and endTime!='' ">
+                AND  MS_DATE <![CDATA[ <= ]]> to_date(#{endTime},'yyyy-mm-dd')
+            </if>
+        </where>
+        ORDER BY MS_DATE
+    </select>
+    <select id="getAll_MARCO_PMI" resultMap="MARCO_PMI_Map">
+        SELECT * FROM MACRO_PMI
+        <where>
+            <if test="startTime!=null and startTime!='' ">
+                AND PMI_DATE <![CDATA[ >= ]]> to_date(#{startTime},'yyyy-mm-dd')
+            </if>
+            <if test="endTime!=null and endTime!='' ">
+                AND PMI_DATE <![CDATA[ <= ]]> to_date(#{endTime},'yyyy-mm-dd')
+            </if>
+        </where>
+        ORDER BY PMI_DATE
+    </select>
+    <select id="getAll_MARCO_PPI" resultMap="MARCO_PPI_Map">
+        SELECT * FROM MACRO_PPI
+        <where>
+            <if test="startTime!=null and startTime!='' ">
+                AND PPI_DATE <![CDATA[ >= ]]> to_date(#{startTime},'yyyy-mm-dd')
+            </if>
+            <if test="endTime!=null and endTime!='' ">
+                AND PPI_DATE <![CDATA[ <= ]]> to_date(#{endTime},'yyyy-mm-dd')
+            </if>
+        </where>
+        ORDER BY PPI_DATE
+    </select>
+
+</mapper>

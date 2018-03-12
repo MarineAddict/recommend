@@ -1,8 +1,5 @@
 package com.yihuisoft.product.customegroup.entity;
 
-import java.util.Date;
-
-
 /**
  * @ClassName:  ProductGroupDetails   
  * @Description:组合产品的信息   

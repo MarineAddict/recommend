@@ -101,7 +101,10 @@ function clearSearch() {
 			field : 'productGroupName',
 			title : '组合名称',
 			width : 200,
-			align : 'center'
+			align : 'center',
+			formatter : function(value, row, index) {
+				return "<a onclick='yieldLine("+row.id+");' iframe='0' >"+value+"</a>"; 
+			}
 		}, {
 			field : 'productCode',
 			title : '产品代码',
@@ -132,6 +135,15 @@ function clearSearch() {
 			}
 		}] ]
 	});
+	
+	function yieldLine(id){
+		id=123;
+		var title = "收益追踪详情";
+		var url = '${pageContext.request.contextPath}/pages/customergroup/productgroup/cutomerYieldLine.jsp?id='+id;
+		var iconCls = "icon-chart-organisation";
+		var iframe = false;
+		addTab(title,url,iconCls,iframe);
+	}
 </script>
 </body>
 </html>

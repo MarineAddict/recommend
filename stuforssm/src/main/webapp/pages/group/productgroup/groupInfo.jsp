@@ -14,7 +14,7 @@ width:1000px;
 <body>
 	<div data-options="region:'north',title:'查询'"
 		style="height: 40px; background: #F4F4F4;">
-		<form id="searchForm">
+		<form id="groupInfo_searchForm">
 			<table>
 				<tr>
 					<th>组合名称：</th>
@@ -57,13 +57,13 @@ sy.serializeObject = function (form) { /*将form表单内的元素序列化为�
 
 //点击查找按钮出发事件
 function searchFunc() {
-    $("#groupList").datagrid("load", sy.serializeObject($("#searchForm").form()));//将searchForm表单内的元素序列为对象传递到后台
+    $("#groupList").datagrid("load", sy.serializeObject($("#groupInfo_searchForm").form()));//将searchForm表单内的元素序列为对象传递到后台
 }
 
 //点击清空按钮出发事件
 function clearSearch() {
     $("#groupList").datagrid("load", {});//重新加载数据，无填写数据，向后台传递值则为空
-    $("#searchForm").find("input").val("");//找到form表单下的所有input标签并清空
+    $("#groupInfo_searchForm").find("input").val("");//找到form表单下的所有input标签并清空
 }
 	$('#groupList').datagrid({
 		width : '100%',

@@ -10,6 +10,16 @@ public class FundBasicDAO {
 	private String ESTAB_DATE;//	DATE 产品成立日期
 	private int STATUS;//	VARCHAR2(1 BYTE) 基金状态
 	private String type;//基金类型
+	
+	private String sname;//	VARCHAR2(20 BYTE) 基金小类名称
+	private int scode;//	VARCHAR2(20 BYTE) 基金小类代码
+	private int invtypone;//投资类型一（基金类型）
+	private String bidcode;//指数标的
+	private int cxfundtyp;//晨星基金类型
+	private String risklevel;//基金风险类型
+	
+	
+	
 	private double growth;//涨幅
 	private double expected_annualized_return;//预期收益率
 	private double expected_risk_ratio;//预期风险率
@@ -93,5 +103,43 @@ public class FundBasicDAO {
 	public void setSTATUS(int sTATUS) {
 		STATUS = sTATUS;
 	}
+	public int getCxfundtyp() {
+		return cxfundtyp;
+	}
+	public void setCxfundtyp(int cxfundtyp) {
+		this.cxfundtyp = cxfundtyp;
+	}
+	public int getInvtypone() {
+		return invtypone;
+	}
+	public void setInvtypone(int invtypone) {
+		this.invtypone = invtypone;
+	}
+	public String getBidcode() {
+		return bidcode;
+	}
+	public void setBidcode(String bidcode) {
+		this.bidcode = bidcode;
+	}
+	public String getSname() {
+		return sname;
+	}
+	public void setSname(String sname) {
+		this.sname = sname;
+	}
+	public int getScode() {
+		return scode;
+	}
+	public void setScode(int scode) {
+		this.scode = scode;
+	}
+	public String getRisklevel() {
+		return risklevel;
+	}
+	public void setRisklevel(String risklevel) {
+		this.risklevel = risklevel;
+	}
+	
+	
 	
 }

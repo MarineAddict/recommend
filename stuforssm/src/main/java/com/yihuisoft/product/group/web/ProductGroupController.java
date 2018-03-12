@@ -1,11 +1,5 @@
 package com.yihuisoft.product.group.web;
 
-import com.yihuisoft.product.group.entity.ProductGroup;
-import com.yihuisoft.product.group.entity.ProductGroupDetails;
-import com.yihuisoft.product.group.entity.dto.ProductGroupDTO;
-import com.yihuisoft.product.group.service.ProductGroupTimeService;
-import com.yihuisoft.product.group.service.ProductGroupService;
-
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
@@ -17,6 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.yihuisoft.product.group.entity.ProductGroup;
+import com.yihuisoft.product.group.entity.ProductGroupDetails;
+import com.yihuisoft.product.group.entity.dto.ProductGroupDTO;
+import com.yihuisoft.product.group.service.ProductGroupService;
+import com.yihuisoft.product.group.service.ProductGroupTimeService;
 
 
 /**

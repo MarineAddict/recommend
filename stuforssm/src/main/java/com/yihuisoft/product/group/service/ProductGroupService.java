@@ -1,20 +1,24 @@
 package com.yihuisoft.product.group.service;
 
-import com.yihuisoft.product.fund.entity.dao.FundProductDAO;
-import com.yihuisoft.product.group.entity.ProductGroup;
-import com.yihuisoft.product.group.entity.ProductGroupBasic;
-import com.yihuisoft.product.group.entity.ProductGroupDetails;
-import com.yihuisoft.product.group.entity.dto.ProductGroupDTO;
-import com.yihuisoft.product.group.mapper.ProductGroupMapper;
-import com.yihuisoft.product.util.CommonCal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.yihuisoft.product.group.entity.ProductGroup;
+import com.yihuisoft.product.group.entity.ProductGroupBasic;
+import com.yihuisoft.product.group.entity.ProductGroupDetails;
+import com.yihuisoft.product.group.entity.dto.ProductGroupDTO;
+import com.yihuisoft.product.group.mapper.ProductGroupMapper;
+import com.yihuisoft.product.util.CommonCal;
 
 /**
  * Created by wangyinyuo on 2018/1/17.
@@ -56,7 +60,8 @@ public class ProductGroupService {
     	List<ProductGroupDetails> pgdList = productGroupMapper.getProductGroupDetailsInfo(productGroupId);
         Map<String,String> map=new HashMap<String,String>();
         map.put("productGroupCode", productGroupId);
-        Calendar c = Calendar.getInstance();c.setTime(new Date());
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
         c.add(Calendar.YEAR, -1);
         Date y = c.getTime();
         String startTime = new SimpleDateFormat("yyyy-MM-dd").format(y);
@@ -67,13 +72,19 @@ public class ProductGroupService {
         for (ProductGroup productGroup : yieldList) {
         	doubleList.add(productGroup.getNavaDj());
         }
-        Maxdrawdown = CommonCal.calculateMaxdrawdown(doubleList);
+        if (doubleList.size() > 1) {
+        	Maxdrawdown = CommonCal.calculateMaxdrawdown(doubleList);
+        }else {
+        	logger.info("产品组合成立一日，数据量不够");
+        }
         productGroupDTO.setMaxdrawdown(Maxdrawdown);
     	productGroupDTO.setId(pgbList.getId());
     	productGroupDTO.setStatus(pgbList.getStatus());
     	productGroupDTO.setCreate_source(pgbList.getCreate_source());
     	productGroupDTO.setSharpeRatio(pgbList.getSharpe_ratio());
     	productGroupDTO.setProduct_group_name(pgbList.getProduct_group_name());
+    	productGroupDTO.setEXPECTED_ANNUALIZED_RETURN(pgbList.getEXPECTED_ANNUALIZED_RETURN());
+    	productGroupDTO.setEXPECTED_RISK_RATIO(pgbList.getEXPECTED_RISK_RATIO());
     	productGroupDTO.setCreate_time(pgbList.getCreate_time());
     	productGroupDTO.setPgdList(pgdList);
     	return productGroupDTO;

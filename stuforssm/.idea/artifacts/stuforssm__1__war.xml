@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="stuforssm (1):war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="stuforssm-0.0.1-SNAPSHOT.war">
+      <element id="artifact" artifact-name="stuforssm (1):war exploded" />
+    </root>
+  </artifact>
+</component>

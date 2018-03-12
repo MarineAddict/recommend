@@ -1,6 +1,7 @@
 ﻿import recommend.com.yihuisoft.product.finance.financeService as financeService
 from recommend.com.yihuisoft.product.datautil.utilforconnection.connFactory import getconn, closeall
 import datetime
+import numpy as np
 
 """ 
      Description : 按天计算收益率和风险率
@@ -65,13 +66,13 @@ def insertFinanceDataDay1(financeCode):
     cursor = conn.cursor()
     for i in range(1,days):
      # sql = "INSERT INTO FINANCE_DATA_DAY (ID,FINANCE_CODE,YIELD_RATIO,RISK_RATIO,NAV_DATE,NAVADJ)VALUES (SEQ_FINANCE_DATA_DAY.NEXTVAL,financeCode,incomeYield,riskYield,to_date('%s','yyyy-mm-dd'),navadj) % (valueDate)"
-        sql = "INSERT INTO FINANCE_DATA_DAY (ID,FINANCE_CODE,NAV_DATE)VALUES (SEQ_FINANCE_DATA_DAY.NEXTVAL,"+financeCode+",to_date('%s','yyyy-mm-dd'))" %(startDate)
+        sql = "INSERT INTO FINANCE_DATA_DAY (ID,CODE,NAV_DATE)VALUES (SEQ_FINANCE_DATA_DAY.NEXTVAL,"+financeCode+",to_date('%s','yyyy-mm-dd'))" %(startDate)
         cursor.execute(sql)
         conn.commit()
         startDate = valueDate + datetime.timedelta(days=i)
         startDate = str(startDate.date())
         print(startDate)
-    sql = "INSERT INTO FINANCE_DATA_MONTH (ID,FINANCE_CODE,NAV_DATE,YIELD_RATIO,RISK_RATIO,NAVADJ)VALUES " \
+    sql = "INSERT INTO FINANCE_DATA_MONTH (ID,CODE,NAV_DATE,YIELD_RATIO,RISK_RATIO,NAVADJ)VALUES " \
           "(SEQ_FINANCE_DATA_DAY.NEXTVAL,"+financeCode+",to_date('%s','yyyy-mm-dd'),)" %(expipyDate)
     cursor.execute(sql)
     conn.commit()
@@ -79,7 +80,7 @@ def insertFinanceDataDay1(financeCode):
 
 """
      Description : 向理财表中插入数据（第二种处理理财产品数据的方式）
-                    每天的净值默认为1+incomeYield*i(i是存的天数)
+                    每天的净值默认为(1+incomeYield)的i次方(i是存的天数)
                     每天的收益率固定为incomeYield
                     风险率默认为0
      Author : tangjian
@@ -91,6 +92,8 @@ def insertFinanceDataDay2(financeCode):
     days, valueDate, expipyDate = getProductDate(financeCode)
     # 理财产品每天的收益率和风险率
     incomeYield, riskYield = calculateIncomeAndRisk(financeCode)
+    incomeYield = pow(1+incomeYield, 1 /365)
+    yieldRatio = incomeYield - 1
     print(incomeYield)
     financeCode = str(financeCode)
     # 起息日
@@ -98,14 +101,14 @@ def insertFinanceDataDay2(financeCode):
     print(startDate)
     conn = getconn()
     cursor = conn.cursor()
-    for i in range(1, 2):
+    for i in range(1, days+1):
      # sql = "INSERT INTO FINANCE_DATA_DAY (ID,FINANCE_CODE,YIELD_RATIO,RISK_RATIO,NAV_DATE,NAVADJ)VALUES (SEQ_FINANCE_DATA_DAY.NEXTVAL,financeCode,incomeYield,riskYield,to_date('%s','yyyy-mm-dd'),navadj) % (valueDate)"
         # 单位净值
-        navadj = (1 + incomeYield * i)
+        navadj = np.power(incomeYield ,i)
         print(navadj)
-        sql = "INSERT INTO FINANCE_DATA_DAY3 (ID,FINANCE_CODE,NAV_DATE,YIELD_RATIO,RISK_RATIO,NAVADJ)" \
+        sql = "INSERT INTO FINANCE_DATA_DAY (ID,CODE,NAV_DATE,YIELD_RATIO,RISK_RATIO,NAVADJ)" \
               "VALUES (SEQ_FINANCE_DATA_DAY.NEXTVAL,"+financeCode+",to_date('%s','yyyy-mm-dd')，'%lf', '%lf','%lf')"\
-              %(startDate,incomeYield,riskYield,navadj)
+              %(startDate,yieldRatio,riskYield,navadj)
         cursor.execute(sql)
         conn.commit()
         startDate = valueDate + datetime.timedelta(days=i)
@@ -135,7 +138,7 @@ def getFinanceCode():
      Params : financeCode理财产品代码
 """
 def getFinanceCode1():
-    sql = "SELECT distinct FINANCE_CODE FROM FINANCE_DATA_DAY "
+    sql = "SELECT distinct CODE FROM FINANCE_DATA_DAY "
     conn = getconn()
     cursor = conn.cursor()
     cursor.execute(sql)

@@ -8,13 +8,11 @@ package com.yihuisoft.product.validate.util;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.yihuisoft.product.validate.entity.Indicators;
@@ -23,11 +21,11 @@ import com.yihuisoft.product.validate.service.YamlReader;
 
 @Component
 public class ValidateUtil {
-	@Autowired
-	static YamlReader reader=new YamlReader();
+	
+	
+	 YamlReader reader=new YamlReader();
 	private static Logger logger=LoggerFactory.getLogger(ValidateUtil.class);
 	
-	private String root=reader.getUrl();
 
 	/**
 	 * 生成对应的url
@@ -41,8 +39,9 @@ public class ValidateUtil {
 public String getValidateRestTemplateUrl(Integer productTypeIndex,Integer IndicatorIndex,Map variables){	
 	   String strPrdType=null;
 	   String strIndicator=null;
-	   String header=root;
-	   StringBuilder sb=new StringBuilder(header);
+	    String root=reader.getUrl();
+
+	   StringBuilder sb=new StringBuilder(root);
 	   try{
 	   strPrdType=ProductType.getPrdTypeByNumber(productTypeIndex).getTitle();
 	   }catch(Exception e){
@@ -50,19 +49,19 @@ public String getValidateRestTemplateUrl(Integer productTypeIndex,Integer Indica
 		   e.printStackTrace();
 		   return null;
 	   }
-	   
+	   String baseUrl=reader.getBaseUrlByProdType(strPrdType);
 	   Map map=reader.getYMLUrlMap(strPrdType); //根据产品类型读取对应的url Map
 	   if(map==null){
 		   return null;
 	   }
 	   try{
-		   strIndicator=Indicators.getIndicatorByNumber(IndicatorIndex).getTitle();
+		   strIndicator=Indicators.getIndicatorByNumber(IndicatorIndex).getRequestMappingUrlTitle();
 		   strIndicator=map.get(strIndicator).toString();
 	   }catch(Exception e){
 		   e.printStackTrace();
 		   return null;
 	   }
-	   sb.append("/"+strPrdType);
+	   sb.append("/"+baseUrl);
 	   sb.append("/"+strIndicator); 
 	 if(variables!=null){
 		 sb.append("?");
@@ -79,7 +78,23 @@ public String getValidateRestTemplateUrl(Integer productTypeIndex,Integer Indica
 	 }
 	   return sb.toString();
    }
-	
+   
+   /**
+    * 判断一个值是否是List
+    * @param obj
+    * @return
+    */
+   public static boolean isList(Object obj){
+	   if(obj instanceof List){
+		   return true;
+	   }else{
+		   return false;
+	   }
+   }
+   
+   
+   
+   
    
    
 	public static void main(String[] args){

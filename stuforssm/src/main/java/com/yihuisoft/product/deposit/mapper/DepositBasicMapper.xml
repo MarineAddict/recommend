@@ -12,7 +12,6 @@
         <result column="INTENDDAY" property="intendday" jdbcType="DATE" />
         <result column="INTEREST" property="interest" jdbcType="NUMERIC" />
         <result column="THETERM" property="theterm" jdbcType="NUMERIC" />
-        <result column="CALCULATE_COVARIANCE" property="calculate_covariance" jdbcType="NUMERIC" />
     </resultMap>
 
     <resultMap id="DepositResultMap" type="com.yihuisoft.product.deposit.entity.Deposit" >
@@ -56,4 +55,35 @@
     <!--<select id="getIncome" parameterType="map" resultType="float">-->
         <!--SELECT INTEREST FROM DEPOSIT_BASIC_DATA WHERE CODE = #{map.productCode}-->
     <!--</select>-->
+    
+
+	<!--zhaodc  -->
+     <select id="getDepositList" parameterType="map" resultType="com.yihuisoft.product.deposit.entity.DepositBasic">
+      select * from (select rownum rn,x.* from (select a.code,a.name,a.substartday,a.subendday,a.intstartday,a.intendday,a.interest,a.theterm
+   ,a.start_money as startmoney,c.*,d.name traceName,d.code traceCode from  deposit_basic_data a join product_category b 
+   on a.code=b.prdcode join system_category c 
+   on b.category_small=c.categorysmallcode join category_bid d on c.categorysmallcode=d.fcode)x) where 
+1=1 
+           <if test="map.productCode != null and map.productCode != '' ">
+                AND CODE = #{map.productCode}
+            </if>
+            <if test="map.productName != null and map.productName != '' ">
+                AND NAME LIKE '%' || #{map.productName}|| '%'
+            </if>
+            <if test="map.start != null and map.start != '' and map.end != null and map.end != ''">
+     and rn between #{map.start} and #{map.end}
+            </if>
+    </select>
+     <select id="getDepositListRows" parameterType="map" resultType="int">
+       SELECT COUNT(*) FROM (
+        SELECT * FROM DEPOSIT_BASIC_DATA WHERE 1=1
+            <if test="map.productCode != null and map.productCode != '' ">
+                AND CODE = #{map.productCode}
+            </if>
+            <if test="map.productName != null and map.productName != '' ">
+                AND NAME LIKE '%' || #{map.productName}|| '%'
+            </if>
+        ORDER BY CODE ASC)
+        
+    </select>
 </mapper>

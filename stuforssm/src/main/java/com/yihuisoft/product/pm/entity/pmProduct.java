@@ -1,7 +1,5 @@
 package com.yihuisoft.product.pm.entity;
 
-import java.util.Date;
-
 /** 
  * @Description:贵金属实体
  * 

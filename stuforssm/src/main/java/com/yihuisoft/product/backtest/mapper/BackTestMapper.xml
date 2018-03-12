@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.backtest.mapper.BackTestMapper">
+    <resultMap id="GroupBasicInfo" type="com.yihuisoft.product.backtest.entity.GroupInfo">
+        <result column="CODE" property="productCode" jdbcType="NUMERIC"/>
+        <result column="WEIGHT" property="weights" jdbcType="NUMERIC"/>
+        <result column="NAME" property="productName" jdbcType="NUMERIC"/>
+
+        <result column="MONEY" property="moneySum" jdbcType="NUMERIC"/>
+        <result column="RET" property="yieldRatio" jdbcType="NUMERIC"/>
+        <result column="DRAWDOWN" property="drawDowns" jdbcType="NUMERIC"/>
+        <result column="GROWTH" property="growth" jdbcType="NUMERIC"/>
+        <result column="PORIFOLIO_DATE" property="createDate" jdbcType="NUMERIC"/>
+
+    </resultMap>
+
+
+    <select id="selectGroupBasicInfoForMvo" resultMap="GroupBasicInfo">
+        SELECT cgd.CODE,cgd.WEIGHT,cs.NAME FROM CATEGORY_GROUP_DETAILS cgd
+        LEFT JOIN CATEGORY_SMALL cs ON cgd.code=cs.code
+        WHERE cgd.WEIGHT > 0 AND cgd.GROUP_ID= #{groupCode}
+    </select>
+
+    <select id="selectGroupBasicInfoForFinance" resultMap="GroupBasicInfo">
+        SELECT bgd.CODE,bgd.WEIGHT,fbd.NAME from BACKTEST_GROUP_DETAILS bgd
+        LEFT JOIN FUND_BASIC_DATA fbd on bgd.code=fbd.code
+        WHERE bgd.WEIGHT > 0 AND bgd.GROUP_ID= #{groupCode}
+    </select>
+
+    <select id="selectGroupBasicInfoForAsset" resultMap="GroupBasicInfo">
+        SELECT bgd.CODE,bgd.WEIGHT,cs.NAME from BACKTEST_GROUP_DETAILS bgd
+        LEFT JOIN CATEGORY_SMALL cs on bgd.code=cs.code
+        WHERE bgd.WEIGHT > 0 AND bgd.GROUP_ID= #{groupCode}
+    </select>
+
+    <insert id="insertBacktestProductGroup">
+        <selectKey resultType="int" order="BEFORE" keyProperty="id">
+            SELECT SEQ_BACKTEST_GROUP_BASIC.Nextval as ID from DUAL
+        </selectKey>
+        insert into BACKTEST_GROUP_BASIC(GROUP_ID,GROUP_NAME,CREATE_TIME,IS_VALID,GROUP_TYPE) values
+        (SEQ_BACKTEST_GROUP_BASIC.NEXTVAL,#{groupName},to_date(#{createTime},'YYYY-MM-DD hh:mi:ss'),
+         '1',#{groupType} )
+    </insert>
+
+    <insert id="insertProductGroupDetails">
+        BEGIN
+        <foreach collection="templist" item="groupInfo" index="index" separator=";">
+            insert into BACKTEST_GROUP_DETAILS values
+            (#{productGroupId},#{groupInfo.productCode},#{groupInfo.weights},
+            to_date(#{groupInfo.createDate},'YYYY-MM-DD hh:mi:ss'),SEQ_BACKTEST_GROUP_DETAILS.NEXTVAL,
+            #{groupInfo.productType})
+        </foreach>
+        ;END;
+    </insert>
+
+    <select id="findProductCode" resultType="java.lang.String" statementType="STATEMENT">
+        SELECT DISTINCT CODE
+        FROM ${tableName}
+    </select>
+
+    <select id="selectPortfolioInfo" resultMap="GroupBasicInfo">
+        SELECT * FROM PORTFOLIO_CALDATA ORDER BY PORIFOLIO_DATE
+    </select>
+
+    <select id="selectBenchmarkInfo" resultMap="GroupBasicInfo">
+        SELECT * FROM BENCHMARK_CALDATA ORDER BY PORIFOLIO_DATE
+    </select>
+
+</mapper>

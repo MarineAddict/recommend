@@ -9,14 +9,14 @@
 </head>
 <div>
 	<div>
-		产品代码:<input id="productCode" type="text" />
-		开始时间:<input id="startTime" type="date" />
-		结束时间:<input id="endTime" type="date" />
-		<button onclick="search();">查询</button>
+		产品代码:<input id="finLine_productCode" type="text" />
+		开始时间:<input id="finLine_startTime" type="date" />
+		结束时间:<input id="finLine_endTime" type="date" />
+		<button onclick="finLine_search();">查询</button>
 	</div>
 	<div>
-	涨幅：<input id="growth" type="text" />
-	最大回撤：<input id="maxdrawdown" type="text" />
+	涨幅：<input id="fin_growth" type="text" />
+	最大回撤：<input id="fin_maxdrawdown" type="text" />
 	</div>
 	<div id="NAVADJLine" style="width: 1200px;height:800px;"></div>
 	<div id="yieldRatioLine" style="width: 1200px;height:800px;"></div>
@@ -25,11 +25,11 @@
 var url;
 var data;
 
-function search(){
+function finLine_search(){
 	
-	var productCode=$('#productCode').val();
-	var startTime=$('#startTime').val();
-	var endTime=$('#endTime').val();
+	var productCode=$('#finLine_productCode').val();
+	var startTime=$('#finLine_startTime').val();
+	var endTime=$('#finLine_endTime').val();
 	
 	//根据不同的产品类型去调用不同的url
 	/* var selected=$("#productType").find("option:selected").val();
@@ -42,17 +42,21 @@ function search(){
 	}else if(selected=='pm'){
 		url="${pageContext.request.contextPath}/pm/yieldRatioLine";
 	} */
+	if(productCode==''||productCode==null){
+		alert("产品代码不能为空!");
+		return ;
+	}
 	
 	//获取最大回撤
 	$.ajax({
 		type:"POST",
 		url:"${pageContext.request.contextPath}/finance/getFinanceMaxdrawdown",
-		data:{financeCode:productCode,startTime:startTime,endTime:endTime,calType:'day'},
+		data:{productCode:productCode,startTime:startTime,endTime:endTime,calType:'day'},
 		timeout:20000,
 		cache:false,
 		success:function(data){
 			console.log(data);
-			$('#maxdrawdown').val(data);
+			$('#fin_maxdrawdown').val(data);
 		},
 		error:function(){
 			alert("请求失败");
@@ -63,12 +67,12 @@ function search(){
 	$.ajax({
 		type:"POST",
 		url:"${pageContext.request.contextPath}/finance/getFinanceExpIncrease",
-		data:{financeCode:productCode,startTime:startTime,endTime:endTime},
+		data:{productCode:productCode,startTime:startTime,endTime:endTime},
 		timeout:20000,
 		cache:false,
 		success:function(data){
 			console.log(data);
-			$('#growth').val(data);
+			$('#fin_growth').val(data);
 		},
 		error:function(){
 			alert("请求失败");
@@ -79,10 +83,17 @@ function search(){
 	$.ajax({
 		type:"POST",
 		url:"${pageContext.request.contextPath}/finance/getFinanceHistoryIncomeLine",
-		data:{financeCode:productCode,startTime:startTime,endTime:endTime},
+		data:{productCode:productCode,startTime:startTime,endTime:endTime},
 		timeout:20000,
 		cache:false,
 		success:function(data){
+			console.log(data);
+			if(startTime==''||startTime==null){
+				$('#finLine_startTime').val(data[0].navDate.substring(0,10));
+			}
+			if(endTime==''||endTime==null){
+				$('#finLine_endTime').val(data[data.length-1].navDate.substring(0,10));
+			} 
 			yieldRatioLine(data);
 			NAVADJLine(data);
 		},
@@ -139,8 +150,8 @@ function yieldRatioLine(data){
 			        //handleColor: 'rgba(128,43,16,0.8)',
 			        //xAxisIndex:[],
 			        //yAxisIndex:[],
-			        start : 40,
-			        end : 60
+			        start : 0,
+			        end : 100
 			    },
 			    xAxis : [
 			        {
@@ -151,13 +162,15 @@ function yieldRatioLine(data){
 			    ],
 			    yAxis : [
 			        {
-			            type : 'value'
+			            type : 'value',
+			            min:0.0001
 			        }
 			    ],
 			    series : [
 			        {
 			            name:'收益率',
 			            type:'line',
+			            symbol:'none',
 			            data:valueList,
 			        }
 			    ],
@@ -216,8 +229,8 @@ function NAVADJLine(data){
 			        //handleColor: 'rgba(128,43,16,0.8)',
 			        //xAxisIndex:[],
 			        //yAxisIndex:[],
-			        start : 40,
-			        end : 60
+			        start : 0,
+			        end : 100
 			    },
 			    xAxis : [
 			        {
@@ -228,13 +241,16 @@ function NAVADJLine(data){
 			    ],
 			    yAxis : [
 			        {
-			            type : 'value'
+			            type : 'value',
+			            min:1,
+			           /*  boundaryGap : [ 0.01,0.01 ], */
 			        }
 			    ],
 			    series : [
 			        {
 			            name:'单位净值',
 			            type:'line',
+			            symbol:'none',
 			            data:valueList,
 			        }
 			    ],

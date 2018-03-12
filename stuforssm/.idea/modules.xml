@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/target/maven-archiver/maven-archiver.iml" filepath="$PROJECT_DIR$/target/maven-archiver/maven-archiver.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stuforssm (1).iml" filepath="$PROJECT_DIR$/stuforssm (1).iml" />
+      <module fileurl="file://$PROJECT_DIR$/target/m2e-wtp/web-resources/META-INF/maven/com.easy.stu/stuforssm/stuforssm (2).iml" filepath="$PROJECT_DIR$/target/m2e-wtp/web-resources/META-INF/maven/com.easy.stu/stuforssm/stuforssm (2).iml" />
+      <module fileurl="file://$PROJECT_DIR$/target/m2e-wtp/web-resources/META-INF/maven/com.easy.stu/stuforssm/stuforssm (3) (com.easy.stu).iml" filepath="$PROJECT_DIR$/target/m2e-wtp/web-resources/META-INF/maven/com.easy.stu/stuforssm/stuforssm (3) (com.easy.stu).iml" />
+    </modules>
+  </component>
+</project>

@@ -3,6 +3,12 @@ package com.yihuisoft.product.pm.mapper;
 import java.util.List;
 import java.util.Map;
 
+import com.yihuisoft.product.fund.entity.FundTrack;
+import com.yihuisoft.product.fund.entity.dao.FundProductDAO;
+import com.yihuisoft.product.pm.entity.PmProductDAO;
+import com.yihuisoft.product.pm.entity.PmTrack;
+import org.apache.ibatis.annotations.Param;
+
 import com.yihuisoft.product.pm.entity.PmBasic;
 import com.yihuisoft.product.pm.entity.pmProduct;
 
@@ -23,4 +29,28 @@ public interface pmMapper {
 	
 	//查询所有产品
 	List<PmBasic> getPmList(Map map);
+	
+	/**
+	 * @author zhaodc
+	 * @param map
+	 * @return
+	 */
+	List<PmBasic> getPmBasicList(@Param("map")Map map);
+
+
+	int getPmBasicListRows(@Param("map")Map map);
+
+
+	Map getPmDetail(@Param("code") String code);
+
+
+	List<PmTrack> getPmTrackList(@Param("code") String code);
+
+	List<PmTrack> getPmIncomeTrend(@Param("map") Map<String, Object> map);
+
+	List<PmTrack> getPmNetValue(@Param("map") Map<String, Object> map);
+
+    List<PmTrack> findDataForDrawdown(@Param("map") Map<String, String> map);
+
+	List<PmProductDAO> getPmNetYieldList(@Param("map") Map map);
 }

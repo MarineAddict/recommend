@@ -7,21 +7,23 @@ urlMap:
    finance:
       type: 1
       base_url: finance
-      netValue_url: getNetValue
+      netValue_url: getFinanceHistoryIncomeLine
       yieldRate_url: getFinanceHistoryIncomeLine
       expYieldRate_url: getFinanceExpIncome
       expRiskRate_url: getFinanceExpRisk
    fund:
       type: 2
-      base_url: fund
-      netValue_url: getNetValue
-      yieldRate_url: yieldRate
-      expYieldRate_url: expYieldRate
-      expRiskRate_url: expRiskRate
+      base_url: fund/
+      netValue_url: yieldRatioLine
+      yieldRate_url: yieldRatioLine
+      expYieldRate_url: yieldRatioLine
+      expRiskRate_url: yieldRatioLine
+      riskRate_url: yieldRatioLine
    deposit:
       type: 3
-      base_url: deposit
-      yieldRatioLine_url: yieldRatioLine
+      base_url: deposit/verification
+      riskRate_url: risk
+      income_url: imcome
 
 excelMap: 
    产品类型: prodType
@@ -38,9 +40,14 @@ excelMap:
    风险率: riskRate
    预期收益率: expYieldRate
    预期风险率: expRiskRate
+   利息: interest
 excelTitle: 
    calculatedYieldRate: 计算收益率
    calculatedNetValue: 计算净值
    calculatedExpYieldRate: 计算预期收益率
    calculatedExpRiskRate: 计算预期风险率
-   
+   calculatedRiskRate: 计算风险率
+   calculatedInterest: 计算利息
+
+errorRate: 0
+  

@@ -23,6 +23,15 @@
 		<result column="RISK_LEVEL" property="riskLevel" jdbcType="VARCHAR" />
 		<result column="UNIT" property="unit" jdbcType="VARCHAR" />
 	</resultMap>
+
+	<resultMap id="PmDAOResultMap" type="com.yihuisoft.product.pm.entity.PmProductDAO" >
+		<result column="ID" property="id" jdbcType="INTEGER" />
+		<result column="CODE" property="productCode" jdbcType="VARCHAR" />
+		<result column="YIELD_RATIO" property="yieldRatio" jdbcType="NUMERIC" />
+		<result column="RISK_RATIO" property="riskRatio" jdbcType="NUMERIC" />
+		<result column="NAV_DATE" property="navDate" jdbcType="VARCHAR" />
+		<result column="NAVDJ" property="navaDj" jdbcType="NUMERIC" />
+	</resultMap>
 	
 	<select id="getYieldRatioLine" parameterType="map" resultMap="BaseResultMap">
 		SELECT * FROM 
@@ -66,4 +75,121 @@
 	</select>
 	
 	
+	<!--zhaodc  -->
+	<select id="getPmBasicList" parameterType="map" resultMap="BasicResultMap">
+	 SELECT * FROM (
+		SELECT t.*,ROWNUM rn FROM(
+			SELECT * FROM PM_BASIC_DATA WHERE 1=1
+			<if test="map.preCode != null and map.preCode != '' ">
+				AND CODE = #{map.preCode}
+			</if>
+			<if test="map.preName!=null and map.preName !=''">
+				AND NAME LIKE '%' || #{map.preName} || '%'
+			</if>
+			<if test="map.preStatus!=null and map.preStatus !=''">
+				AND STATUS = #{map.preStatus}
+			</if>
+			<if test="map.releaseDate!=null and map.releaseDate!=''">
+				AND  RELEASE_DATE &gt;= to_date(#{map.releaseDate},'yyyy-mm-dd hh24:mi:ss')
+			</if>
+			ORDER BY RELEASE_DATE DESC)t WHERE #{map.end} >= ROWNUM)
+		WHERE rn >= #{map.start}
+	</select>
+
+	<select id="getPmBasicListRows" parameterType="map" resultType="int">
+		SELECT COUNT(*) FROM(
+			SELECT * FROM PM_BASIC_DATA WHERE 1=1
+			<if test="map.preCode != null and map.preCode != '' ">
+				AND CODE = #{map.preCode}
+			</if>
+			<if test="map.preName!=null and map.preName !=''">
+				AND NAME LIKE '%' || #{map.preName} || '%'
+			</if>
+			<if test="map.preStatus!=null and map.preStatus !=''">
+				AND STATUS = #{map.preStatus}
+			</if>
+			<if test="map.releaseDate!=null and map.releaseDate!=''">
+				AND  RELEASE_DATE &gt;= to_date(#{map.releaseDate},'yyyy-mm-dd hh24:mi:ss')
+			</if>
+			)
+	</select>
+
+	<!--贵金属详情-->
+	<select id="getPmDetail" resultType="hashmap">
+		select A.*,c.name as categoryname,d.name as bidname
+		from pm_basic_data A
+		left join product_category B on A.code=b.prdcode
+		left join category_small C on b.category_small=c.code
+		left join category_bid D on c.code=d.fcode
+		WHERE A.code =#{code}
+	</select>
+
+	<!--贵金属涨幅曲线-->
+	<select id="getPmIncomeTrend" resultType="com.yihuisoft.product.pm.entity.PmTrack">
+	  select A.CODE,B.NAVADJ,B.NAVLATESTDATE,D.DATA from pm_basic_data A
+      left join pm_net_value B on a.code=b.code
+      left join product_category C on A.code=prdcode
+      left join category_data D on c.category_small=d.code
+      where A.code=#{map.code} and B.NAVLATESTDATE=D.DAY and B.NAVADJ is not null
+		<if test="map.flag==0">
+			<if test="map.days != null and map.days != ''">
+				and B.NAVLATESTDATE <![CDATA[ >= ]]> sysdate-#{map.days}
+			</if>
+		</if>
+		<if test="map.flag==1">
+			<if test="map.startTime != null and map.startTime != ''">
+				and B.NAVLATESTDATE <![CDATA[ >= ]]>  to_date(#{map.startTime},'yyyy-mm-dd')
+			</if>
+			<if test="map.endTime != null and map.endTime != ''">
+				and day <![CDATA[ <= ]]> to_date(#{map.endTime},'yyyy-mm-dd')
+			</if>
+		</if>
+		order by B.NAVLATESTDATE ASC
+	</select>
+
+	<!--贵金属单位净值走势曲线-->
+	<select id="getPmNetValue" resultType="com.yihuisoft.product.pm.entity.PmTrack">
+		select * from PM_NET_VALUE
+		<where>
+			code=#{map.code} and NAVADJ is not null
+			<if test="map.flag==0">
+				<if test="map.days != null and map.days != ''">
+					and navlatestdate <![CDATA[ >= ]]> sysdate-#{map.days}
+				</if>
+			</if>
+			<if test="map.flag==1">
+				<if test="map.startTime != null and map.startTime != ''">
+					and navlatestdate <![CDATA[ >= ]]>  to_date(#{map.startTime},'yyyy-mm-dd')
+				</if>
+				<if test="map.endTime != null and map.endTime != ''">
+					and navlatestdate <![CDATA[ <= ]]> to_date(#{map.endTime},'yyyy-mm-dd')
+				</if>
+			</if>
+		</where>
+		order by navlatestdate asc
+	</select>
+
+
+	<select id="getPmNetYieldList" resultMap="PmDAOResultMap">
+		SELECT * FROM  pm_data_day where 1=1
+		<if test="map.code != null and map.code != '' ">
+			AND CODE=#{map.code}
+		</if>
+		<if test="map.startTime !=null and map.startTime!=''">
+			AND NAV_DATE >= to_date(#{map.startTime},'yyyy-mm-dd')
+		</if>
+		<if test="map.endTime !=null and map.endTime!=''">
+			AND to_date(#{map.endTime},'yyyy-mm-dd') >= NAV_DATE
+		</if>
+		ORDER BY NAV_DATE ASC
+	</select>
+	<!--跟踪误差-->
+	<select id="getPmTrackList" resultType="com.yihuisoft.product.pm.entity.PmTrack">
+		select A.CODE,B.NAVADJ,B.NAVLATESTDATE,D.DATA from pm_basic_data A
+      left join pm_net_value B on a.code=b.code
+      left join product_category C on A.code=prdcode
+      left join category_data D on c.category_small=d.code
+      where A.code=#{code} and B.NAVLATESTDATE=D.DAY and B.NAVADJ is not null and navlatestdate>(sysdate-365) order by navlatestdate asc
+	</select>
+
 </mapper>

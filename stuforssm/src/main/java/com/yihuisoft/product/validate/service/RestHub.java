@@ -7,7 +7,7 @@ public interface RestHub {
 	 * @param url 请求路径
 	 * @return
 	 */
-	String startARestRequest(String url);
+	Object startARestRequest(String url);
 	
 	
 	

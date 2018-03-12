@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.backtest.mapper.GenerateGroupMapper">
+    <resultMap id="GroupInfo" type="com.yihuisoft.product.backtest.entity.GroupInfo">
+        <result column="GROUP_ID" property="groupCode" jdbcType="NUMERIC"/>
+        <result column="GROUP_YIELD" property="yieldRatio" jdbcType="NUMERIC"/>
+        <result column="GROUP_RISK" property="riskRatio" jdbcType="NUMERIC"/>
+        <result column="CREATE_TIME" property="createDate" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+
+    <select id="selectGroupInfo" resultMap="GroupInfo">
+        SELECT GROUP_ID,GROUP_YIELD,GROUP_RISK,CREATE_TIME
+        FROM
+        (SELECT *  FROM CATEGORY_GROUP_BASIC WHERE IS_VALID=1 ORDER BY GROUP_ID desc)
+        WHERE ROWNUM <![CDATA[ <= ]]> 10
+        ORDER BY ROWNUM  desc
+    </select>
+
+</mapper>

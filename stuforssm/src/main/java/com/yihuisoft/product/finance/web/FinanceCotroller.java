@@ -1,12 +1,18 @@
 package com.yihuisoft.product.finance.web;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihuisoft.product.finance.entity.FinanceBasicData;
 import com.yihuisoft.product.finance.entity.FinanceDataDay;
 import com.yihuisoft.product.finance.service.FinanceService;
@@ -40,15 +46,23 @@ public class FinanceCotroller {
 	 * @author tangjian
 	 * @Description: 产品理财产品列表(通过产品状态，产品名称，产品代码)
 	 * @return List<FinanceBasicData>
+	 * @throws JsonProcessingException 
 	 * @date: 2018年1月19日 上午11:44:43
 	 */
 	@RequestMapping("/getFinanceList")
 	@ResponseBody
-	public List<FinanceBasicData> getFinanceList(String code,String financeName, Integer status) {
-		List<FinanceBasicData> financeBasicDatas = financeService
-				.getFinanceList(code,financeName,status);
-		return financeBasicDatas;
+	public String  getFinanceList(@RequestParam int page,@RequestParam int rows,String financeName, String financeCode,String financeType,String financeRiskLevel, Integer financeStatus) throws JsonProcessingException {
+		int start = (page-1)*rows+1;
+        int end = page*rows;
+		List<FinanceBasicData> financeBasicDatas = financeService.getFinanceList(start,end,financeName,financeCode,financeType,financeRiskLevel,financeStatus);
+		int total= financeService.qryFinanceListRows(financeName,financeCode,financeType,financeRiskLevel,financeStatus);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("total", total);
+		map.put("rows", financeBasicDatas);
+		ObjectMapper mapper = new ObjectMapper();
+		return mapper.writeValueAsString(map);
 	}
+
 
 	/**
 	 * @author tangjian
@@ -59,8 +73,8 @@ public class FinanceCotroller {
 	 */
 	@RequestMapping("/delFinancePro")
 	@ResponseBody
-	public int delFinancePro(String financeCode) {
-		int delFlag = financeService.deleteFinancePro(financeCode);
+	public int delFinancePro(String productCode) {
+		int delFlag = financeService.deleteFinancePro(productCode);
 		return delFlag;
 	}
 
@@ -98,7 +112,6 @@ public class FinanceCotroller {
 	public Double getFinanceExpRisk(String productCode) {
 		Double riskRatio = financeService.calFinanceExpRisk(productCode);
 		return riskRatio;
-
 	}
 	/**
 	 * @author tangjian
@@ -117,6 +130,7 @@ public class FinanceCotroller {
 				productCode, startTime, endTime);
 		return gorwthRatio;
 	}
+	
 	/**
 	 * @Title: getFinanceMaxdrawdown 
 	 * @author tangjian
@@ -164,4 +178,48 @@ public class FinanceCotroller {
 		Double riskRatio = financeService.calRiskSemiVariance(productCode, startTime, endTime);
 		return riskRatio;
 	}
+	
+	
+	/**
+	 * 加载理财基本信息
+	 * @author zhaodc
+	 * @param financecode
+	 * @return
+	 */
+	@RequestMapping("/toFinanceDetail")
+	@ResponseBody
+	public ModelAndView toFinanceDetail(String code){
+		ModelAndView mv= new ModelAndView();
+		Map map= financeService.qryFinanceDetail(code);
+		mv.addObject("finance", map);
+		mv.setViewName("product/finance/financeDetail");
+		return mv;
+	}
+	
+	/**
+	 * 理财涨幅曲线
+	 * @author zhaodc
+	 * @param code
+	 * @return
+	 */
+	@RequestMapping("/toFinanceAchie")
+	@ResponseBody
+	public Map toFinanceAchie(String code,String bidcode){
+		return financeService.qryFinanceTrend(code,bidcode);
+	}
+	
+	/**
+	 * 理财收益率曲线
+	 * @author zhaodc
+	 * @param code
+	 * @return
+	 */
+	@RequestMapping("/toFinanceYields")
+	@ResponseBody
+	public Map toFinanceYields(String code){
+		return financeService.qryFinanceYields(code);
+	}
+	
+	
+	
 }

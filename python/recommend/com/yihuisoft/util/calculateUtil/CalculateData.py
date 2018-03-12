@@ -100,3 +100,6 @@ def calculateLeftVariance(yield_list,tar_return):
 
 
 
+
+
+

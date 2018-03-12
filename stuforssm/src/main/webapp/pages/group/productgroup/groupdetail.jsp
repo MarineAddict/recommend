@@ -1,20 +1,23 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
+<script src="<c:url value="/js/echars/echarts.js"/>"></script>
 </head>
-<body>
 产品组合代码：<input id="id" type="text">
 产品组合名称：<input id="product_group_name" type="text"></br>
 sharp比率：<input id="sharpeRatio" type="text">
 创建时间：<input id="create_time" type="text">
 <table id="productgroup"></table>
+<div id="productPropotion" style="width: 400px;height:200px;"></div>
 <script type="text/javascript">
 //获取数据
 var id=<%=request.getParameter("id")%>;
+var result;
+var array = [];
 $.ajax({
 	type:"POST",
 	url:"${pageContext.request.contextPath}/productGroup/productGroupId/"+id+"/getProductGroupDetailsInfo",
@@ -22,6 +25,8 @@ $.ajax({
 	cache:false,
 	success:function(data){
 		console.log(data);
+		pieChart(data);
+		/* result=data; */
 		$('#id').val(data.id);
 		$('#product_group_name').val(data.product_group_name);
 		$('#sharpeRatio').val(data.sharpeRatio);
@@ -44,7 +49,79 @@ $.ajax({
 		alert("请求失败");
 	}
 });
+
+//画饼图
+function pieChart(result){
+	for(var i=0;i<result.pgdList.length;i++){
+		var map={};
+		map.name=result.pgdList[i].product_code;
+		map.value=result.pgdList[i].proportion;
+		array[i]=map;
+	}
+
+	var myChart = echarts.init(document.getElementById('productPropotion'));
+	option = {
+		    title : {
+		        text: '',
+		        subtext: '',
+		        x:'center'
+		    },
+		    tooltip : {
+		        trigger: 'item',
+		        formatter: "{a} <br/>{b} : {c} ({d}%)"
+		    },
+		   /*  legend: {
+		        orient : 'vertical',
+		        x : 'left',
+		        data:['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
+		    },  */
+		    toolbox: {
+		        show : true,
+		        feature : {
+		            mark : {show: true},
+		            dataView : {show: true, readOnly: false},
+		            magicType : {
+		                show: true, 
+		                type: ['pie', 'funnel'],
+		                option: {
+		                    funnel: {
+		                        x: '25%',
+		                        width: '50%',
+		                        funnelAlign: 'left',
+		                        max: 1548
+		                    }
+		                }
+		            },
+		            restore : {show: true},
+		            saveAsImage : {show: true}
+		        }
+		    },
+		    calculable : true,
+		    series : [
+		        {
+		            name:'产品占比',
+		            type:'pie',
+		            radius : '55%',
+		            center: ['50%', '60%'],
+		            data:array,
+		            itemStyle: {
+                        normal: {
+                            label: {
+                                show: true,
+                                position: 'outer',
+                                formatter: '{b} : ({d}%)'
+                            }/* ,
+                            labelLine: {
+                                show: false
+                            } */
+                        }
+                    }
+		        }
+		    ],
+		    
+		};
+	myChart.setOption(option);    
+}
+              
 </script>
 
-</body>
-</html>

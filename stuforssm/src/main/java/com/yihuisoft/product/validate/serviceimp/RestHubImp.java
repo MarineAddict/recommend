@@ -23,9 +23,9 @@ public class RestHubImp implements RestHub{
 	return null;
 	}
 
-	public String startARestRequest(String url) {	
+	public Object startARestRequest(String url) {	
 		Object returned=template.postForEntity(url,null,Object.class).getBody();
-		return returned.toString();
+		return returned;
 	}
 	
 	

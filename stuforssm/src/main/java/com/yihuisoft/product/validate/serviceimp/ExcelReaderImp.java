@@ -3,7 +3,6 @@ package com.yihuisoft.product.validate.serviceimp;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -23,10 +22,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.codehaus.jackson.map.introspect.BasicClassIntrospector.GetterMethodFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.yihuisoft.product.validate.entity.ExcelInfo;
@@ -43,7 +40,7 @@ public class ExcelReaderImp implements ExcelReader {
 	private static Logger logger=LoggerFactory.getLogger(ExcelReaderImp.class);
 	private static final String UNPARSABLETITLE="未知列名";
 	
-	@Autowired
+	
 	private YamlReader yml=new YamlReader();
 	
 	//获取Excel文件的数据

@@ -1,7 +1,5 @@
 package com.yihuisoft.product.group.entity;
 
-import java.util.List;
-
 /**
  * Created by wangyinyuo on 2018/1/17.
  */

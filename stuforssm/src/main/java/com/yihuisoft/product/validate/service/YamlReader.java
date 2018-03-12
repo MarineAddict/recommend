@@ -7,23 +7,25 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
-import com.yihuisoft.product.validate.util.ValidateUtil;
 
-@Component("yamlReaderImp")
 public class YamlReader {
 
-	/*public static final String URL="D:\\项目文档\\python\\code\\stuforssm\\src\\main\\resources\\validate-config.yml"; *///yml 文件地址，部署需要更改
-	private static String URL = YamlReader.class.getClassLoader().getResource("validate-config.yml").getPath();
-	private static final String URLMAP="urlMap"; //url路径Map
-	private static final String EXCELPARAMMAP="excelMap"; //Excel对应的Map
-	private static final String EXCELTITLEMAP="excelTitle"; //写入对应Excel的标题
-	private static final String HTTPURL="httpUrl";
+	public static final String URL = /*YamlReader.class.getClassLoader().getResource("validate-config.yml").getPath();*/
+	"D:\\项目文档\\python\\code\\stuforssm\\src\\main\\resources\\validate-config.yml";
+	/*YamlReader.class.getClassLoader().getResource("validate-config.yml").getPath();*/
+	public static final String URLMAP="urlMap"; //url路径Map
+	public static final String EXCELPARAMMAP="excelMap"; //Excel对应的Map
+	public static final  String EXCELTITLEMAP="excelTitle"; //写入对应Excel的标题
+	public static final  String HTTPURL="httpUrl";
+	public static final String ERRORRATE="errorRate";
 	
 	private static Logger logger=LoggerFactory.getLogger(YamlReader.class);
-	
+	/**
+	 * 获取http的请求路径
+	 * @return
+	 */
 	public String getUrl(){
 		Yaml yl=new Yaml();
 		try{
@@ -37,7 +39,11 @@ public class YamlReader {
 		return null;
 	}
 	
-	
+	/**
+	 * 根据产品类型获得所有旗下的指标对应的url
+	 * @param productType
+	 * @return
+	 */
 	public Map<String,Map> getYMLUrlMap(String productType){
 		Yaml yl=new Yaml();
 		try{
@@ -51,6 +57,17 @@ public class YamlReader {
 		return null;
 	}
 	
+	
+	public String getBaseUrlByProdType(String productType){
+		Map map=getYMLUrlMap(productType);
+		return map.get("base_url").toString();
+	}
+	
+	/**
+	 * 获取Excel数据时转换为统一的英文key
+	 * @param paramName
+	 * @return
+	 */
 	public String getYMLExcel2Standard(String paramName){
 		Yaml yl=new Yaml();
 		String str=null;
@@ -70,7 +87,11 @@ public class YamlReader {
 		return str;
 	}
 	
-	
+	/**
+	 * 将对应的统一的英文key转换为写入Excel的Title值
+	 * @param paramName
+	 * @return
+	 */
 	public String getYMLTitleInExcel(String paramName){
 		Yaml yl=new Yaml();
 		String str=null;
@@ -89,15 +110,27 @@ public class YamlReader {
 		}
 		return str;
 	}
-	
-	
-	
+	/**
+	 * 获取误差率
+	 * @return
+	 */
+	public double getErrorRate(){
+		Yaml yl=new Yaml();
+		double str=0;
+		try{
+		Map<String,Object> map=(Map<String,Object>)yl.load(new FileInputStream(new File(URL)));	
+		  str=Double.parseDouble(map.get(ERRORRATE).toString());
+		}catch (Exception e) {
+			logger.error("找不到对应的误差字段");
+		}
+		return str;
+	}
 	
 	
 	
 	public static void main(String[] args) throws FileNotFoundException{
 		YamlReader s=new YamlReader();
-		String m=s.getYMLTitleInExcel("calculatedNetValue");
+		double m=s.getErrorRate();
 		System.out.println(m);
 	}
 	

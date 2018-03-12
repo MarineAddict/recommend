@@ -14,19 +14,19 @@ width:1000px;
 <body>
 	<div data-options="region:'north',title:'查询'"
 		style="height: 40px; background: #F4F4F4;">
-		<form id="searchForm">
+		<form id="fundRatio_searchForm">
 			<table>
 				<tr>
 					<th>产品代码：</th>
-					<td><input name="productCode" /></td>
+					<td><input id="fundRiskRatioProductCode" name="productCode" /></td>
 					<th>开始时间</th>
-					<td><input class="easyui-datetimebox" editable="false"
+					<td><input id="fundRiskRatioStartTime" class="easyui-datebox" editable="false"
 						name="startTime" /></td>
 					<th>结束时间</th>
-					<td><input class="easyui-datetimebox" editable="false"
+					<td><input id="fundRiskRatioEndTime" class="easyui-datebox" editable="false"
 						name="endTime" /></td>
 					<th>类型</th>
-					<td><select id="type" class="easyui-combobox" data-options="editable:false" style="width:100px;">
+					<td><select id="fund_type" class="easyui-combobox" data-options="editable:false" style="width:100px;">
 					  <option value ="day">天</option>
 					  <option value ="week">周</option>
 					  <option value="month">月</option>
@@ -47,21 +47,28 @@ width:1000px;
 			</table>
 		</form>
 	</div>
-	预期收益率：<input id="expected_annualized_return" type="text">
-	预期风险率：<input id="expected_risk_ratio"  type="text">
+	预期收益率：<input id="fund_expected_annualized_return" type="text">
+	预期风险率：<input id="fund_expected_risk_ratio"  type="text">
 
 <script type="text/javascript">
 
 //点击查找按钮出发事件
 function caculate() {
 	
-	var productCode=$('#productCode').val();
-	var startTime=$('#startTime').val();
-	var endTime=$('#endTime').val();
+	var productCode=$('#fundRiskRatioProductCode').val();
+	var startTime=$("#fundRiskRatioStartTime").datebox("getValue");
+	var endTime=$("#fundRiskRatioEndTime").datebox("getValue");
 	var url="";
 	
+	
+	if(productCode==''||productCode==null){
+		alert("产品代码不能为空!");
+		return ;
+	}
+	
 	//根据不同的产品类型去调用不同的url
-	var selected=$("#type").find("option:selected").val();
+	var selected=$("#fund_type").combobox("getValue");
+	
 	if(selected=='day'){
 		url="${pageContext.request.contextPath}/fund/cycle/day/getFundBasicInfo";
 	}else if(selected=='week'){
@@ -71,7 +78,6 @@ function caculate() {
 	}else if(selected=='year'){
 		url="${pageContext.request.contextPath}/fund/cycle/year/getFundBasicInfo";
 	}
-	
 	//获取预期收益率和预期风险率
 	$.ajax({
 		type:"POST",
@@ -80,8 +86,14 @@ function caculate() {
 		timeout:20000,
 		cache:false,
 		success:function(data){
-			$('#expected_annualized_return').val(data[0].expected_annualized_return);
-			$('#expected_risk_ratio').val(data[0].expected_risk_ratio);
+			if(startTime==''||startTime==null){
+				$("#fundRiskRatioStartTime").datebox("setValue", data[0].ipo_START_DATE.substring(0,10));   
+			}
+			if(endTime==''||endTime==null){
+				$("#fundRiskRatioEndTime").datebox("setValue", data[0].ipo_END_DATE.substring(0,10));  
+			}
+			$('#fund_expected_annualized_return').val(Number(data[0].expected_annualized_return).toFixed(4));
+			$('#fund_expected_risk_ratio').val(Number(data[0].expected_risk_ratio).toFixed(4));
 		},
 		error:function(){
 			alert("请求失败");
@@ -91,7 +103,7 @@ function caculate() {
 
 //点击清空按钮出发事件
 function clearSearch() {
-    $("#searchForm").find("input").val("");//找到form表单下的所有input标签并清空
+    $("#fundRatio_searchForm").find("input").val("");//找到form表单下的所有input标签并清空
 }
 </script>
 </body>

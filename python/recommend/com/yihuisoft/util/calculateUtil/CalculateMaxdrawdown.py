@@ -11,6 +11,8 @@ logger=getlogging();    #获取日志对象
  '''
 def calculateMaxdrawdown(data):
     if len(data)>1:     #   len(data) > 1  and data cannot have values <= 0
+        if(data[-1]>=max(data[0:len(data)-1])):
+            return 0;
         drawdown=[];
         data.reverse();    #倒序
         for index,item in enumerate(data):
@@ -26,5 +28,16 @@ def calculateMaxdrawdown(data):
         return ;    # return None ;
 
     return round(min(min(drawdown),0),4);   # 最大回撤  (保留 4 位)
+
+
+def calculateMaxdrawdownByMoney(data):
+    if len(data)>1:     #   len(data) > 1  and data cannot have values <= 0
+        if(data[-1]>=max(data[0:len(data)-1])):
+            return 0;
+        else:
+            return round((data[-1]-max(data[0:len(data)-1]))/max(data[0:len(data)-1]),4);
+    else:
+        logger.info('The length of data must > 1');
+        return ;    # return None ;
 
 

@@ -21,14 +21,16 @@ class EffcientFrontier:
         @Param: yieldlist：组合中各产品预期收益率   type:list
                 covlist：组合中各产品协方差矩阵  type:list[list]
                 point_count: 点 数量
+                ub: 权重上限
+                lb: 权重下限
     '''
-    def efficientFrontier(self,yieldlist,covlist,point_count):
+    def efficientFrontier(self,yieldlist,covlist,point_count,ub,lb):
         eff=EffcientFrontier()
         eff.yieldlist=yieldlist;
         eff.covlist=covlist;
         noa=len(yieldlist);
         #参数值(权重)上下限。这些值以多个元组组成的一个元组形式提供给最小化函数
-        bnds=tuple((0.0,1.0) for x in range(noa))
+        bnds=tuple((lb,ub) for x in range(noa))
         min_yield=min(yieldlist);
         max_yield=max(yieldlist);
         target_returns = np.linspace(min_yield,max_yield,point_count*2) # min_yield  与 max_yield 之间 取样本数 point_count*2
@@ -38,7 +40,7 @@ class EffcientFrontier:
             cons = ({'type':'eq','fun':lambda weights:eff.statistics(weights)[0]-tar},{'type':'eq','fun':lambda weights:np.sum(weights)-1})
             res =optimize.minimize(eff.min_variance, noa*[1./noa,],method = 'SLSQP', bounds = bnds, constraints = cons)
             target_variance.append(res['fun'])
-            target_weights.append(np.around(res['x'],5))    #(保留 5 位)
+            target_weights.append(np.around(res['x'],4))    #(保留 4 位)
 
         #取 数据 递增部分（有效前沿部分）
         min_variance=min(target_variance);  #最小风险率
@@ -48,9 +50,9 @@ class EffcientFrontier:
         efficient_weights=target_weights[index_min_variance:]   #截取 target_weights
 
         #绘制 有效前沿线
-        eff.draw_pic(efficient_returns,efficient_variance);
+        # eff.draw_pic(efficient_returns,efficient_variance);
         #绘制 全图
-        eff.draw_pic(target_returns,target_variance);
+        # eff.draw_pic(target_returns,target_variance);
 
         result=[];  # 返回 结果
         result.append(np.around(efficient_variance,5)); #组合风险   (保留 5 位)

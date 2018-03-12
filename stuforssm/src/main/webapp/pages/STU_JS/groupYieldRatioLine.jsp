@@ -19,12 +19,12 @@
     color: #444;
 } */
 
-table {
+#productList {
 	text-align:center;
     *border-collapse: collapse; /* IE7 and lower */
     border-spacing: 0;
     width: 100%;    
-}
+} 
 
 .bordered {
 	text-align:center;

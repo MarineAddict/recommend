@@ -1,12 +1,13 @@
 package com.yihuisoft.product.deposit.mapper;
 
-import com.yihuisoft.product.deposit.entity.Deposit;
-import com.yihuisoft.product.deposit.entity.DepositBasic;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import java.util.List;
-import java.util.Map;
+import com.yihuisoft.product.deposit.entity.Deposit;
+import com.yihuisoft.product.deposit.entity.DepositBasic;
 
 /**
  *  Description ：存单基本信息数据处理
@@ -40,4 +41,20 @@ public interface DepositBasicMapper {
 
     @Select("SELECT DISTINCT RISK_RATIO FROM DEPOSIT_DATA_DAY WHERE CODE = #{map.productCode}")
     float getRisk(@Param("map")Map map);
+    
+    
+    /**
+     * @author zhaodc
+     * 查询存款列表-查询分页
+     * @param start
+     * @param end
+     * @param code
+     * @param name
+     * @return
+     */
+    List<DepositBasic> getDepositList(@Param("map")Map map);
+    int getDepositListRows(@Param("map")Map map);
+    
+    
+    
 }

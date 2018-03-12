@@ -9,12 +9,15 @@ public class FinanceBasicData {
 	private Double realYield; // 真实收益率
 	private String valueDate; // 起息日
 	private String expiryDate; // 到息
+	private String period; //委托周期
 	private Double expYieldMin; // 最小期望收益率
 	private String risklevel; // 风险等级
 	private Integer calculateCovariance;//是否计算协方差（1是 0 否）calculateCovariance
 	private String 	financeName;//理财产品名称
 	private Integer financeStatus;//理财产品状态
-	private Double startMoney;//理财产品状态
+	private Double startMoney;//起购金额
+	private Integer scode;//
+	private String  prdType;//
 
 	public Double getStartMoney() {
 		return startMoney;
@@ -122,4 +125,30 @@ public class FinanceBasicData {
 	public void setRisklevel(String risklevel) {
 		this.risklevel = risklevel;
 	}
+
+	public String getPeriod() {
+		return period;
+	}
+
+	public void setPeriod(String period) {
+		this.period = period;
+	}
+
+	public Integer getScode() {
+		return scode;
+	}
+
+	public void setScode(Integer scode) {
+		this.scode = scode;
+	}
+
+	public String getPrdType() {
+		return prdType;
+	}
+
+	public void setPrdType(String prdType) {
+		this.prdType = prdType;
+	}
+	
+	
 }

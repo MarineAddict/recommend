@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from recommend.com.yihuisoft.util.calculateUtil.CalculateData import calculateCovariance;
 import math;
+import pandas as pd
 
 '''
     @Desc: 计算组合所需协方差矩阵
@@ -42,8 +43,27 @@ def calculateGeometricMean(value_list):
     else:
         return ;    #None
 
+def calculate_group_params(data):
+    temp=[value for key,value in data.groupby(data['code'])]
+    r=[]
+    for value in temp:
+        code=str(value.iloc[0]['code'])
+        value.fillna(method='ffill',inplace=True)
+        value.fillna(method='bfill',inplace=True)
+        value['ret']=value['close'].pct_change()
+        value.dropna(inplace=True)
+        value.index=value['date']
+        value=value['ret']
+        value.rename(code,inplace=True)
+        r.append(value)
+    r=pd.concat(r,axis=1)
+    r.dropna(inplace=True)
 
+    mean=r.mean()
+    mean=(1+mean)**252-1
+    cov=r.cov()*252
 
+    return mean,cov
 
 
 

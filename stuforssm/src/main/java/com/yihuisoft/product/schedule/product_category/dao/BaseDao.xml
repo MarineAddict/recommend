@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yihuisoft.product.schedule.product_category.dao.BaseDao">
+
+ <select id="getFundProductDataByPage" resultType='com.yihuisoft.product.schedule.product_category.entity.FundBasicData'>
+   SELECT * FROM 
+   (select rownum rn,a.* from(select id,code,name,status,invtypone,invtyptwo,bidcode,cxfundtyp from  fund_basic_data)a)b 
+   WHERE b.rn BETWEEN #{page.StartRow} AND #{page.EndRow}
+ </select>
+  
+  
+  <select id="getFundProductTotalNumber" resultType="Integer">
+    select count(*) from fund_basic_data
+  </select>
+  
+  
+   <select id="getDepositProductDataByPage" resultType='com.yihuisoft.product.schedule.product_category.entity.DepositBasicData'>  
+   SELECT * FROM 
+   (select rownum rn,a.* from(select id,code,name,substartday,subendday,intstartday,intendday,interest,theterm from  deposit_basic_data)a)b 
+   WHERE b.rn BETWEEN #{page.StartRow} AND #{page.EndRow}
+ </select>
+  
+  
+   <select id="getDepositProductTotalNumber" resultType="Integer">
+    select count(*) from deposit_basic_data
+  </select>
+  
+  
+</mapper>

@@ -59,15 +59,15 @@ def calDayIncomeAndRisk(expYieldMax, expYieldMin, realYield, expYieldMaxAvg, exp
     expRatioDay = 0.0
     riskYield = 0.0
     if expYieldMax != 0.0 and expYieldMax != "" and expYieldMin != 0.0 and expYieldMin != "":
-        expRatioDay = (expYieldMax + expYieldMin) / (2 * 365)
+        expRatioDay = (expYieldMax + expYieldMin) / 2
     elif expYieldMax != 0.0 and expYieldMax != "":
-        expRatioDay = expYieldMax / 365
+        expRatioDay = expYieldMax
     elif realYield != 0.0 and realYield != "":
-        expRatioDay = realYield / 365
+        expRatioDay = realYield
     elif expYieldMaxAvg != 0.0 and expYieldMaxAvg != "" and expYieldMinAvg != 0.0 and expYieldMinAvg != "":
-        expRatioDay = (expYieldMaxAvg + expYieldMinAvg) / (2 * 365)
+        expRatioDay = (expYieldMaxAvg + expYieldMinAvg) / 2
     else:
-        expRatioDay = expYieldMaxAvg / 365
+        expRatioDay = expYieldMaxAvg
     return expRatioDay, riskYield
 
 """

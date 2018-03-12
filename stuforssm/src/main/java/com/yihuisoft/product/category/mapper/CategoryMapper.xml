@@ -14,6 +14,15 @@
         <result column="NAME" property="name" jdbcType="VARCHAR"/>
         <result column="FNAME" property="fcode" jdbcType="NUMERIC"/>
     </resultMap>
+    
+    <resultMap id="category" type="com.yihuisoft.product.category.entity.Category">
+        <result column="BGCODE" property="bgCode" jdbcType="NUMERIC"/>
+        <result column="SMCODE" property="smCode" jdbcType="NUMERIC"/>
+        <result column="BGNAME" property="bgName" jdbcType="VARCHAR"/>
+        <result column="SMNAME" property="smName" jdbcType="VARCHAR"/>
+        <result column="BIDNAME" property="bidName" jdbcType="VARCHAR"/>
+        <result column="BIDCODE" property="bidCode" jdbcType="NUMERIC"/>
+    </resultMap>
 
     <insert id="createNewCategoryBig" parameterType="map" >
         insert into category_big values(seq_category_big.nextval, seq_category_big.currval,#{map.bigCategory})
@@ -46,4 +55,82 @@
     <select id="selectAllCategorySmall" parameterType="map" resultMap="categorySmall">
         select * from category_small where fcode = #{map.id}
     </select>
+    
+    
+    
+    <!--zhaodc  start-->
+    <select id="getCategoryList" parameterType="map" resultMap="category">
+        SELECT 
+        	A.code AS smcode,A.name AS smname,B.code AS bgcode,B.name AS bgname ,C.name AS bidname ,C.code AS bidcode
+        FROM category_small A
+        	 LEFT JOIN category_big B  ON A.fcode=B.code
+        	 LEFT JOIN category_bid C ON A.code=C.fcode
+    </select>
+    
+    <select id="getOneBidDetail" resultType="hashmap">
+		SELECT A.*,B.NAME FROM (SELECT code, max(day) AS DMAX,min(day) AS DMIN FROM category_data1 GROUP BY CODE HAVING code=#{code} )A LEFT JOIN CATEGORY_SMALL B ON A.CODE=B.CODE
+    </select>
+    
+    <select id="getCategoryDataList"     resultType="com.yihuisoft.product.category.entity.CategoryData">
+select x.code,(x.data-y.data)/y.data*100 as data,x.day from CATEGORY_DATA x join 
+(select * from CATEGORY_DATA where day = to_date(#{map.startTime},'yyyy-mm-dd') and code in 
+(select distinct code from category_data) union
+select a.* from category_data a join  ( select code,min(day)mindate from category_data where code in 
+ (select * from (select distinct code from category_data) a where code not in 
+ (select code from CATEGORY_DATA where day = to_date(#{map.startTime},'yyyy-mm-dd'))) and data is not null group by code)b
+ on a.code=b.code and a.day=b.mindate)y on x.code=y.code where x.day &gt;= to_date(#{map.startTime},'yyyy-mm-dd') and x.day &lt;= to_date(#{map.endTime},'yyyy-mm-dd')
+ order by day
+    </select>
+    
+    <select id="getOneBidData" parameterType="map" resultType="com.yihuisoft.product.category.entity.CategoryData">
+       	SELECT * FROM CATEGORY_DATA1
+      	WHERE 1=1 
+			<if test="map.code !=null and map.code != '' ">
+				AND CODE = #{map.code}
+			</if>
+			<if test="map.starTime !=null and map.starTime !='' ">
+				AND DAY &gt; to_date(#{map.starTime},'yyyy-mm-dd')  
+			</if>
+			<if test="map.endTime!=null and map.endTime !=''">
+				AND to_date(#{map.endTime},'yyyy-mm-dd') &gt; DAY
+			</if>
+       	 ORDER BY DAY ASC
+    </select>
+    
+     <!--zhaodc  end-->
+     
+     
+<select id="getProductAssetInfo" resultType="com.yihuisoft.product.category.entity.dto.ProductAssetInfo">
+   SELECT * FROM (SELECT ROWNUM RN,C.* FROM (SELECT * FROM (SELECT X.CODE,X.NAME,X.BIDCODE,Y.* FROM 
+(SELECT A.CODE,A.NAME,A.BIDCODE,B.CATEGORY_SMALL FROM FUND_BASIC_DATA A JOIN PRODUCT_CATEGORY B ON A.CODE=B.PRDCODE) X
+JOIN 
+(SELECT A.CODE CATEGORYBIGCODE,A.NAME CATEGORYBIGNAME,B.CODE CATEGORYSMALLCODE,B.NAME CATEGORYSMALLNAME FROM CATEGORY_BIG A JOIN CATEGORY_SMALL B ON A.CODE=B.FCODE) Y
+ON X.CATEGORY_SMALL=Y.CATEGORYSMALLCODE) WHERE 1=1 
+
+<if test="map.categorybig !=null and map.categorybig !=''">
+and CATEGORYBIGCODE=#{map.categorybig,jdbcType=NUMERIC}
+</if>
+<if test="map.categorysmall !=null and map.categorysmall !=''">
+ AND CATEGORYSMALLCODE=#{map.categorysmall,jdbcType=NUMERIC}
+</if>
+
+) C) WHERE RN BETWEEN #{page.rowStart} AND #{page.rowEnd}
+</select>
+     
+     <select id="getTotalProductAssetInfo" resultType="Integer">
+        SELECT count(*) FROM (SELECT ROWNUM RN,C.* FROM (SELECT * FROM (SELECT X.CODE,X.NAME,X.BIDCODE,Y.* FROM 
+(SELECT A.CODE,A.NAME,A.BIDCODE,B.CATEGORY_SMALL FROM FUND_BASIC_DATA A JOIN PRODUCT_CATEGORY B ON A.CODE=B.PRDCODE) X
+JOIN 
+(SELECT A.CODE CATEGORYBIGCODE,A.NAME CATEGORYBIGNAME,B.CODE CATEGORYSMALLCODE,B.NAME CATEGORYSMALLNAME FROM CATEGORY_BIG A JOIN CATEGORY_SMALL B ON A.CODE=B.FCODE) Y
+ON X.CATEGORY_SMALL=Y.CATEGORYSMALLCODE) WHERE 1=1 
+
+<if test="map.categorybig !=null and map.categorybig !=''">
+and CATEGORYBIGCODE=#{map.categorybig,jdbcType=NUMERIC}
+</if>
+<if test="map.categorysmall !=null and map.categorysmall !=''">
+ AND CATEGORYSMALLCODE=#{map.categorysmall,jdbcType=NUMERIC}
+</if>
+
+) C)
+     </select>
 </mapper>

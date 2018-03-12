@@ -1,14 +1,14 @@
 package com.yihuisoft.product.group.mapper;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.yihuisoft.product.group.entity.ProductGroup;
 import com.yihuisoft.product.group.entity.ProductGroupBasic;
 import com.yihuisoft.product.group.entity.ProductGroupDetails;
 import com.yihuisoft.product.group.entity.dao.ProductNavadjDAO;
-
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by wangyinyuo on 2018/1/17.

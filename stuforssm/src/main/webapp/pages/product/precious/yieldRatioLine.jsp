@@ -9,27 +9,27 @@
 </head>
 <div>
 	<div>
-		产品代码:<input id="productCode" type="text" />
-		开始时间:<input id="startTime" type="date" />
-		结束时间:<input id="endTime" type="date" />
-		<button onclick="search();">查询</button>
+		产品代码:<input id="preLine_productCode" type="text" />
+		开始时间:<input id="preLine_startTime" type="date" />
+		结束时间:<input id="preLine_endTime" type="date" />
+		<button onclick="preSearch();">查询</button>
 	</div>
 	<div>
-	涨幅：<input id="growth" type="text" />
-	最大回撤：<input id="maxdrawdown" type="text" />
+	涨幅：<input id="pm_growth" type="text" />
+	最大回撤：<input id="pm_maxdrawdown" type="text" />
 	</div>
-	<div id="yieldRatioLine" style="width: 1200px;height:800px;"></div>
-	<div id="NAVADJLine" style="width: 1200px;height:800px;"></div>
+	<div id="pm_yieldRatioLine" style="width: 1200px;height:800px;"></div>
+	<div id="pm_NAVADJLine" style="width: 1200px;height:800px;"></div>
 </div>
 <script type="text/javascript">
 var url;
 var data;
 
-function search(){
+function preSearch(){
 	
-	var productCode=$('#productCode').val();
-	var startTime=$('#startTime').val();
-	var endTime=$('#endTime').val();
+	var productCode=$('#preLine_productCode').val();
+	var startTime=$('#preLine_startTime').val();
+	var endTime=$('#preLine_endTime').val();
 	
 	//根据不同的产品类型去调用不同的url
 	/* var selected=$("#productType").find("option:selected").val();
@@ -42,6 +42,10 @@ function search(){
 	}else if(selected=='pm'){
 		url="${pageContext.request.contextPath}/pm/yieldRatioLine";
 	} */
+	if(productCode==''||productCode==null){
+		alert("产品代码不能为空!");
+		return ;
+	}
 	
 	//获取涨幅和最大回撤
 	$.ajax({
@@ -52,8 +56,8 @@ function search(){
 		cache:false,
 		success:function(data){
 			console.log(data);
-			$('#growth').val(data.growth);
-			$('#maxdrawdown').val(data.Maxdrawdown);
+			$('#pm_growth').val(data.growth);
+			$('#pm_maxdrawdown').val(data.Maxdrawdown);
 		},
 		error:function(){
 			alert("请求失败");
@@ -68,8 +72,15 @@ function search(){
 		timeout:20000,
 		cache:false,
 		success:function(data){
-			yieldRatioLine(data);
-			NAVADJLine(data);
+			if(startTime==''||startTime==null){
+				$('#preLine_startTime').val(data[0].navDate.substring(0,10));
+			}
+			if(endTime==''||endTime==null){
+				$('#preLine_endTime').val(data[data.length-1].navDate.substring(0,10));
+			}
+			
+			pm_yieldRatioLine(data);
+			pm_NAVADJLine(data);
 		},
 		error:function(){
 			alert("请求失败");
@@ -79,14 +90,14 @@ function search(){
 }
 
 //收益率曲线
-function yieldRatioLine(data){
+function pm_yieldRatioLine(data){
 	var xList=[];
 	var yList=[];
 	for(var i=0;i<data.length;i++){
 		xList.push(data[i].navDate.substring(0,10));
 		yList.push(data[i].yieldRatio);
 	}
-	var myChart = echarts.init(document.getElementById('yieldRatioLine'));
+	var myChart = echarts.init(document.getElementById('pm_yieldRatioLine'));
 
 
 	var dateList = xList;
@@ -124,8 +135,8 @@ function yieldRatioLine(data){
 			        //handleColor: 'rgba(128,43,16,0.8)',
 			        //xAxisIndex:[],
 			        //yAxisIndex:[],
-			        start : 40,
-			        end : 60
+			        start : 0,
+			        end : 100
 			    },
 			    xAxis : [
 			        {
@@ -143,6 +154,7 @@ function yieldRatioLine(data){
 			        {
 			            name:'收益率',
 			            type:'line',
+			            symbol:'none',
 			            data:valueList,
 			        }
 			    ],
@@ -156,14 +168,14 @@ function yieldRatioLine(data){
 }
 
 //单位净值曲线
-function NAVADJLine(data){
+function pm_NAVADJLine(data){
 	var xList=[];
 	var yList=[];
 	for(var i=0;i<data.length;i++){
 		xList.push(data[i].navDate.substring(0,10));
 		yList.push(data[i].navaDj);
 	}
-	var myChart = echarts.init(document.getElementById('NAVADJLine'));
+	var myChart = echarts.init(document.getElementById('pm_NAVADJLine'));
 
 
 	var dateList = xList;
@@ -201,8 +213,8 @@ function NAVADJLine(data){
 			        //handleColor: 'rgba(128,43,16,0.8)',
 			        //xAxisIndex:[],
 			        //yAxisIndex:[],
-			        start : 40,
-			        end : 60
+			        start : 0,
+			        end : 100
 			    },
 			    xAxis : [
 			        {
@@ -221,6 +233,7 @@ function NAVADJLine(data){
 			        {
 			            name:'单位净值',
 			            type:'line',
+			            symbol:'none',
 			            data:valueList,
 			        }
 			    ],

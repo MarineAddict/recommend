@@ -10,6 +10,13 @@
         <result column="NAV_DATE" property="navDate" jdbcType="VARCHAR" />
         <result column="NAVDJ" property="navaDj" jdbcType="NUMERIC" />
     </resultMap>
+
+	<resultMap id="FundTrackMap" type="com.yihuisoft.product.fund.entity.FundTrack" >
+		<result column="NAVADJ" property="navadj" jdbcType="NUMERIC" />
+		<result column="NAVLATESTDATE" property="navlatestdate" jdbcType="VARCHAR" />
+		<result column="DATA" property="data" jdbcType="NUMERIC" />
+	</resultMap>
+
     <select id="getFundYieldRisk" parameterType="map" resultMap="FundBaseResultMap">
         SELECT * FROM 
         <if test="'day' == cycle">fund_data_day</if>
@@ -38,5 +45,183 @@
             </if>
     	</where>
     </select>
+    
+
+    <!-- zhaodc-->
+    <select id="getFundBasicInfoList" resultType="com.yihuisoft.product.fund.entity.dao.FundBasicDAO">
+    	SELECT * FROM (
+    		SELECT t.CODE,t.NAME,t.IPO_START_DATE,t.IPO_END_DATE,t.ESTAB_DATE,t.STATUS,t.TYPE,t.SNAME,T.SCODE,t.INVTYPONE,t.BIDCODE,t.CXFUNDTYP,t.RISKLEVEL,ROWNUM rn FROM(
+    			SELECT F.*,c.category_SMALL as SCODE,C.NAME as SNAME FROM  FUND_BASIC_DATA F join (select a.prdcode,A.category_SMALL,b.name from product_category a join category_small b on a.category_small=b.code)c  on f.code=c.prdcode  WHERE 1=1
+    			<if test="map.code != null and  map.code != '' ">
+    				AND	F.NAME  LIKE '%' || #{map.code}|| '%'
+    			</if>
+    			<if test="map.code != null and  map.code != '' ">
+    				OR	F.CODE  LIKE '%' || #{map.code}|| '%'
+    			</if>
+    			<if test="map.starTime != null and  map.starTime != '' ">
+    				AND F.IPO_START_DATE &gt; = to_date(#{map.starTime},'yyyy-mm-dd hh24:mi:ss')
+    			</if>
+    			<if test="map.endTime != null and  map.endTime != '' ">
+    				AND to_date(#{map.endTime},'yyyy-mm-dd hh24:mi:ss') >= F.IPO_END_DATE
+    			</if>
+    			<if test="map.funStatus != null and  map.funStatus != '' ">
+					AND  F.STATUS = #{map.funStatus}
+    			</if>
+    			<if test="map.fundTyp != null and  map.fundTyp != '' ">
+					AND  F.INVTYPONE = #{map.fundTyp}
+    			</if>
+    			<if test="map.cxfunTyp != null and  map.cxfunTyp != '' ">
+					AND  F.CXFUNDTYP = #{map.cxfunTyp}
+    			</if>
+    			<if test="map.scode != null and  map.scode != '' ">
+					AND  c.category_SMALL = #{map.scode}
+    			</if>
+    			)t WHERE  #{map.end}>=ROWNUM
+			)
+      	WHERE rn >= #{map.start}
+    </select>
+    
+    <select id="getFundBasicInfoListRows" resultType="int">
+    	SELECT COUNT(*) FROM (
+    		SELECT F.*,c.category_SMALL as SCODE,C.NAME as SNAME FROM  FUND_BASIC_DATA F join (select a.prdcode,A.category_SMALL,b.name from product_category a join category_small b on a.category_small=b.code)c  on f.code=c.prdcode WHERE 1=1
+    			<if test="map.code != null and  map.code != '' ">
+    				AND	F.NAME  LIKE '%' || #{map.code}|| '%'
+    			</if>
+    			<if test="map.code != null and  map.code != '' ">
+    				OR	F.CODE  LIKE '%' || #{map.code}|| '%'
+    			</if>
+    			<if test="map.starTime != null and  map.starTime != '' ">
+    				AND F.IPO_START_DATE &gt;= to_date(#{map.starTime},'yyyy-mm-dd hh24:mi:ss')
+    			</if>
+    			<if test="map.endTime != null and  map.endTime != '' ">
+    				AND to_date(#{map.endTime},'yyyy-mm-dd hh24:mi:ss') &gt;= F.IPO_END_DATE
+    			</if>
+    			<if test="map.funStatus != null and  map.funStatus != '' ">
+					AND  F.STATUS = #{map.funStatus}
+    			</if>
+    			<if test="map.fundTyp != null and  map.fundTyp != '' ">
+					AND  F.INVTYPONE = #{map.fundTyp}
+    			</if>
+    			<if test="map.cxfunTyp != null and  map.cxfunTyp != '' ">
+					AND  F.CXFUNDTYP = #{map.cxfunTyp}
+    			</if>
+    			<if test="map.scode != null and  map.scode != '' ">
+					AND  c.category_SMALL = #{map.scode}
+    			</if>
+    		)
+    </select>
+    
+   
+     <select id="getFundDetail" resultType="hashmap">
+    	SELECT A.*,B.TYPNAME AS CXTYP,C.NAME as SNAME ,c.code AS bcode,d.name as bname
+    		FROM FUND_BASIC_DATA A 
+    			left join CXFUNDTYP B on A.cxfundtyp = B.typno
+    			left join (select p.prdcode,p.category_small,q.name,q.code from product_category p join category_small q on p.category_small=q.code) C on  A.code=C.prdcode
+                left join category_bid D on c.code=d.fcode
+    	WHERE A.code =#{code} 
+    </select>
+
+    <select id="getFundTrackList" resultType="com.yihuisoft.product.fund.entity.FundTrack">
+	  select * from (
+	  select a.*,b.code as bcode,b.data,b.day  from 
+			(select * from FUND_NET_VALUE where code=#{fundcode} and NAVADJ is not null)a
+			join (select * from category_data_sh where code=#{bidcode} and data is not null) b on a.NAVLATESTDATE=b.day 
+		) where day > (sysdate-365)  order by day asc
+    </select>
+    <select id="getFundIncomeTrend" resultType="com.yihuisoft.product.fund.entity.FundTrack">
+			select * from (
+				select t.*,p.bcode,p.data,p.day from FUND_NET_VALUE t  join 
+					(select a.code as catcode,a.name as catname ,b.code as bcode,b.name as bidname,c.data,c.day,d.prdcode 
+   						 from category_SMALL a 
+       						 join category_bid b on a.code=b.fcode 
+       						 join category_data c on b.code=c.code 
+        					 join product_category d on a.code=d.category_small 
+        			where d.prdcode=#{map.fundcode} )p  on t.NAVLATESTDATE=p.day and t.code =p.prdcode
+			) where navadj is not null
+				<if test="map.flag==0">
+					<if test="map.days != null and map.days != ''">
+						and day <![CDATA[ >= ]]> sysdate-#{map.days}
+					</if>
+				</if>
+				<if test="map.flag==1">
+					<if test="map.startTime != null and map.startTime != ''">
+						and day <![CDATA[ >= ]]>  to_date(#{map.startTime},'yyyy-mm-dd')
+					</if>
+					<if test="map.endTime != null and map.endTime != ''">
+						and day <![CDATA[ <= ]]> to_date(#{map.endTime},'yyyy-mm-dd')
+					</if>
+				</if>
+			order by day asc
+    </select>
+    <select id="getFundNetValue" resultType="com.yihuisoft.product.fund.entity.FundTrack">
+		select *  from FUND_NET_VALUE
+		<where>
+			code=#{map.code} and NAVADJ is not null
+			<if test="map.flag==0">
+				<if test="map.days != null and map.days != ''">
+					and navlatestdate <![CDATA[ >= ]]> sysdate-#{map.days}
+				</if>
+			</if>
+			<if test="map.flag==1">
+				<if test="map.startTime != null and map.startTime != ''">
+					and navlatestdate <![CDATA[ >= ]]>  to_date(#{map.startTime},'yyyy-mm-dd')
+				</if>
+				<if test="map.endTime != null and map.endTime != ''">
+					and navlatestdate <![CDATA[ <= ]]> to_date(#{map.endTime},'yyyy-mm-dd')
+				</if>
+			</if>
+		</where>
+		order by navlatestdate asc
+    </select>
+    
+     <select id="getFundNetYieldList" resultMap="FundBaseResultMap">
+		 SELECT *FROM  fund_data_day where 1=1
+            <if test="map.code != null and map.code != '' ">
+                AND CODE=#{map.code}
+            </if>
+            <if test="map.startTime !=null and map.startTime!=''">
+                AND NAV_DATE >= to_date(#{map.startTime},'yyyy-mm-dd hh24:mi:ss')
+            </if>
+            <if test="map.endTime !=null and map.endTime!=''">
+                AND to_date(#{map.endTime},'yyyy-mm-dd hh24:mi:ss') >= NAV_DATE
+            </if>
+        ORDER BY NAV_DATE ASC
+    </select>
+    
+     <select id="getFundMonetaryYieldList" resultType="com.yihuisoft.product.fund.entity.FundMonetaryYield">
+		 SELECT code,serevenyield,millionyield,to_char(pdate,'yyyy-mm-dd') as pdate  FROM  FUND_MONETARY_DATA where 1=1
+            <if test="map.code != null and map.code != '' ">
+                AND CODE=#{map.code}
+            </if>
+            <if test="map.flag==0">
+				<if test="map.days != null and map.days != ''">
+					and PDATE >= sysdate-#{map.days}
+				</if>
+			</if>
+			 <if test="map.flag==1">
+           		 <if test="map.startTime !=null and map.startTime!=''">
+              		AND PDATE >= to_date(#{map.startTime},'yyyy-mm-dd hh24:mi:ss')
+            	</if>
+           		 <if test="map.endTime !=null and map.endTime!=''">
+               		AND to_date(#{map.endTime},'yyyy-mm-dd hh24:mi:ss') >= PDATE
+           		 </if>
+            </if>
+            AND SEREVENYIELD is not null and  MILLIONYIELD is not null
+        ORDER BY PDATE ASC
+    </select>
+    
+    
+    <!--zhaodc  -->
+
+	<select id="findDataForDrawdown" resultMap="FundTrackMap">
+		select t.NAVADJ,to_char(t.NAVLATESTDATE,'yyyy-mm-dd') AS NAVLATESTDATE,c.data from (select A.*,B.* from fund_net_value A JOIN product_category B 
+		 on A.code=B.prdcode  where A.code=#{map.productCode})t  join CATEGORY_DATA  C on c.code=t.category_small and t.NAVLATESTDATE=c.day
+		WHERE t.NAVLATESTDATE >= to_date(#{map.startDate},'yyyy-mm-dd')
+		AND to_date(#{map.endDate},'yyyy-mm-dd') >= t.NAVLATESTDATE
+		AND t.NAVADJ is NOT NULL
+		ORDER BY t.NAVLATESTDATE
+	</select>
+
+
 
 </mapper>

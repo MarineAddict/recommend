@@ -15,6 +15,8 @@
 		<result property="financeStatus" column="FINANCE_STATUS" />
 		<result property="startMoney" column="START_MONEY" />
 		<result property="calculateCovariance" column="CALCULATE_COVARIANCE" />
+		<result property="scode" column="SCODE" />
+		<result property="prdType" column="PRODUCT_TYPE" />
 	</resultMap>
 
 	<sql id="Base_Column_List">
@@ -23,25 +25,92 @@
 	</sql>
 	
 	<select id="selectFinanceList" resultMap="BaseResultMap">
-		SELECT CODE,FINANCE_NAME, EXP_YIELD_MAX, REAL_YIELD, VALUE_DATE,
-		EXPIRY_DATE, EXP_YIELD_MIN, RISK_LEVEL,FINANCE_STATUS ,START_MONEY FROM FINANCE_BASIC_DATA FBD
-		<where>
-			<if test="code != null and  code != '' ">
-			AND FBD.CODE LIKE '%' || #{code} || '%'
-			</if>
-			<if test="financeName!=null and financeName!=''">
-			AND FBD.FINANCE_NAME LIKE '%' || #{financeName}|| '%'
-			</if>
-			<if test="status!=null and status!=''">
-			AND FBD.FINANCE_STATUS = #{status}
-			</if>
-		</where>
+		SELECT * FROM (
+			SELECT t.*,ROWNUM rn FROM (
+				SELECT A.CODE,A.FINANCE_NAME,A.PRODUCT_TYPE, A.EXP_YIELD_MAX, A.REAL_YIELD,A.PERIOD, A.VALUE_DATE,A.EXPIRY_DATE, A.EXP_YIELD_MIN, 
+				A.RISK_LEVEL,A.FINANCE_STATUS ,A.START_MONEY,B.category_small AS SCODE FROM FINANCE_BASIC_DATA A JOIN PRODUCT_CATEGORY B ON A.CODE=B.PRDCODE 
+				WHERE 1=1 
+				<if test="map.financeCode != null and  map.financeCode != '' ">
+					AND A.CODE LIKE '%' || #{map.financeCode} || '%'
+				</if>
+				<if test="map.financeName!=null and map.financeName!=''">
+					AND A.FINANCE_NAME LIKE '%' || #{map.financeName}|| '%'
+				</if>
+				<if test="map.financeType!=null and map.financeType!=''">
+					AND A.PRODUCT_TYPE =#{map.financeType}
+				</if>
+				<if test="map.financeRiskLevel!=null and map.financeRiskLevel!=''">
+					AND A.RISK_LEVEL =#{map.financeRiskLevel}
+				</if>
+				<if test="map.status!=null and map.status!=''">
+					AND A.FINANCE_STATUS = #{map.status}
+				</if>
+				) t WHERE  #{map.end}>=ROWNUM
+			)
+      	WHERE rn >= #{map.start}
 	</select>
+	
+	<select id="selectFinanceListRows" resultType="int">
+			SELECT COUNT(*) FROM (
+				SELECT A.CODE,A.FINANCE_NAME,A.PRODUCT_TYPE, A.EXP_YIELD_MAX, A.REAL_YIELD,A.PERIOD, A.VALUE_DATE,A.EXPIRY_DATE, A.EXP_YIELD_MIN, 
+				A.RISK_LEVEL,A.FINANCE_STATUS ,A.START_MONEY,B.category_small AS SCODE FROM FINANCE_BASIC_DATA A JOIN PRODUCT_CATEGORY B ON A.CODE=B.PRDCODE 
+				WHERE 1=1 
+				<if test="map.financeCode != null and  map.financeCode != '' ">
+					AND A.CODE LIKE '%' || #{map.financeCode} || '%'
+				</if>
+				<if test="map.financeName!=null and map.financeName!=''">
+					AND A.FINANCE_NAME LIKE '%' || #{map.financeName}|| '%'
+				</if>
+				<if test="map.financeType!=null and map.financeType!=''">
+					AND A.PRODUCT_TYPE =#{map.financeType}
+				</if>
+				<if test="map.financeRiskLevel!=null and map.financeRiskLevel!=''">
+					AND A.RISK_LEVEL =#{map.financeRiskLevel}
+				</if>
+				<if test="map.status!=null and map.status!=''">
+					AND A.FINANCE_STATUS = #{map.status}
+				</if>
+			)
+	</select>
+	
+	
+	
 	<select id="selectFinanceInfo" resultMap="BaseResultMap">
-		SELECT * FROM FINANCE_BASIC_DATA  WHERE CODE = #{financeCode}
+		SELECT * FROM FINANCE_BASIC_DATA  WHERE CODE = #{productCode}
 	</select>
 	
 	<select id="selectExpYield" resultType = "java.lang.Double">
-		SELECT AVG(EXP_YIELD_MAX) FROM FINANCE_BASIC_DATA WHERE CODE = #{financeCode} AND RISK_LEVEL = #{risklevel}
+		SELECT AVG(EXP_YIELD_MAX) FROM FINANCE_BASIC_DATA WHERE CODE = #{productCode} AND RISK_LEVEL = #{risklevel}
 	</select>
+	<select id="getFinanceDetail" resultType = "hashmap">
+		SELECT A.*,B.NAME AS SNAME ,B.CODE AS SCODE,D.CODE AS BIDCODE,D.NAME AS BIDNAME 
+		FROM  FINANCE_BASIC_DATA A 
+			JOIN (select p.prdcode,p.category_small,q.name,q.code from product_category p join category_small q on p.category_small=q.code)B ON A.CODE=B.PRDCODE
+            JOIN CATEGORY_BID D ON  b.category_small=d.fcode
+         WHERE A.CODE=#{map.financecode}
+	</select>
+	<select id="getFinanceTrend" resultType = "hashmap">
+		SELECT A.*,B.CATEGORY_SMALL AS SCODE FROM FINANCE_BASIC_DATA A  JOIN PRODUCT_CATEGORY B ON A.CODE=B.PRDCODE WHERE  A.CODE=#{map.financecode}
+	</select>
+	<select id="getListDays" resultType = "string">
+		select to_char(to_date(#{map.startTime},'yyyy-mm-dd')+level-1,'yyyy-mm-dd') as dat 
+			from dual
+		connect by  to_date(#{map.endTime},'yyyy-mm-dd')-to_date(#{map.startTime},'yyyy-mm-dd')+1 >= level
+	</select>
+	
+	 <select id="getTheBidData" parameterType="map" resultType="com.yihuisoft.product.category.entity.CategoryData">
+       	SELECT * FROM CATEGORY_DATA1
+      	WHERE 1=1 
+			<if test="map.code !=null and map.code != '' ">
+				AND CODE = #{map.code}
+			</if>
+			<if test="map.starTime !=null and map.starTime !='' ">
+				AND DAY >= to_date(#{map.starTime},'yyyy-mm-dd')  
+			</if>
+			<if test="map.endTime!=null and map.endTime !=''">
+				AND to_date(#{map.endTime},'yyyy-mm-dd') >= DAY
+			</if>
+       	 ORDER BY DAY ASC
+    </select>
+	
 </mapper>

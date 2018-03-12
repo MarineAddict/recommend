@@ -13,7 +13,7 @@ height:100%;
 </style> 
 </head>
 <body>
-智能推荐
+上海译会资产配置平台
 <%-- <img alt="产品智能推荐" src="${pageContext.request.contextPath}/images/index.jpg" height="690" width="1500"> --%>
 </body>
 </html>

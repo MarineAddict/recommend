@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yihuisoft.product.correlation.mapper.CorrelationMapper">
+	<!--zhaodec  -->
+	<select id="getDistinctName" resultType="String">
+	SELECT  B.NAME FROM
+		(SELECT DISTINCT CODE  FROM CATEGORY_DATA  )T 
+		LEFT JOIN CATEGORY_SMALL B ON B.CODE=T.CODE ORDER BY T.CODE ASC
+	</select>
+	<!--  -->
+	
+	<select id="getDistinctCode" resultType="String">
+	 	SELECT DISTINCT CODE  FROM CATEGORY_DATA ORDER BY CODE ASC 
+	</select>
+	
+	<select id="getCodeData" parameterType="String" resultType="Double">
+		<!-- SELECT DATA FROM CATEGORY_DATA WHERE CODE=#{code} AND DATA IS NOT NULL -->
+		
+		select data from category_data where code=#{code} and day in(
+			
+			select day from category_data where code=1 
+			
+				<if test="startTime != null and startTime != '' ">
+					and day > to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')
+				</if>
+				<if test="endTime != null and endTime != '' ">
+					and to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss') > day  
+				</if>
+			and data is not null 
+			
+		INTERSECT
+			select day from category_data where code=2 
+				
+				<if test="startTime != null and startTime != '' ">
+					and day > to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')  
+				</if>
+				<if test="endTime != null and endTime != '' ">
+					and to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss') > day  
+				</if>
+			and data is not null 
+		
+		INTERSECT
+			select day from category_data where code=3 
+				
+				<if test="startTime != null and startTime != '' ">
+					and day > to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')  
+				</if>
+				<if test="endTime != null and endTime != '' ">
+					and to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss') > day  
+				</if>
+			and data is not null 
+		
+		INTERSECT
+			select day from category_data where code=4 
+				
+				<if test="startTime != null and startTime != '' ">
+					and day > to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')  
+				</if>
+				<if test="endTime != null and endTime != '' ">
+					and to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss') > day  
+				</if>
+			and data is not null 
+		
+		INTERSECT
+			select day from category_data where code=5 
+				
+				<if test="startTime != null and startTime != '' ">
+					and day > to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')  
+				</if>
+				<if test="endTime != null and endTime != '' ">
+					and to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss') > day  
+				</if>
+			and data is not null 
+		
+		INTERSECT
+			select day from category_data where code=6
+				
+				<if test="startTime != null and startTime != '' ">
+					and day > to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')  
+				</if>
+				<if test="endTime != null and endTime != '' ">
+					and to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss') > day  
+				</if>
+			and data is not null 
+		
+		INTERSECT
+			select day from category_data where code=7
+				
+				<if test="startTime != null and startTime != '' ">
+					and day > to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')  
+				</if>
+				<if test="endTime != null and endTime != '' ">
+					and to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss') > day  
+				</if>
+			and data is not null 
+		
+		INTERSECT
+			select day from category_data where code=8
+				
+				<if test="startTime != null and startTime != '' ">
+					and day > to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')  
+				</if>
+				<if test="endTime != null and endTime != '' ">
+					and to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss') > day  
+				</if>
+			and data is not null)
+	</select>
+	
+	<select id="getInitTime" resultType="String">
+		select day from (
+			select tb.*, rownum from category_data tb  order by day asc)
+			where rownum=1
+			union
+			select day from (
+			select tb.*, rownum from category_data tb  order by day desc)
+			where rownum=1
+	</select>
+	
+</mapper>
